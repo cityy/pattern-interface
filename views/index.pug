@@ -1,0 +1,68 @@
+extends layout
+
+block content
+  //- ==================================================
+  //- HUD 
+  //- ==================================================
+  div#hud
+   div.container-fluid
+    //- HUD
+    //- add Node
+    //-
+    div(class='row justify-content-center')
+     a(href='#', class='', id='addNode')
+      i(class='fa fa-2x fa-plus-circle')
+    //- HUD
+    //- delete Nodes
+    //-
+    div(class='row justify-content-center')
+     a(href='#', class='disabled', id='deleteNodes')
+      i(class='fa fa-2x fa-minus-circle')
+    //- HUD
+    //- edit Node
+    //-
+    div(class='row justify-content-center')
+     a(href='#', class='disabled', id='editNode')
+      i(class='fa fa-2x fa-pencil')
+    //- HUD
+    //- connect Nodes
+    //-
+    div(class='row justify-content-center')
+     a(href='#', class='disabled', id='addNode')
+      i(class='fa fa-2x fa-exchange')
+    //- HUD
+    //- canvas Control line #1
+    //-
+    div(class='row justify-content-center', id='canvasControl')
+     div.col-4
+     div.col-4
+      a(href='#', class='', id='canvasUp')
+       i(class='fa fa-2x fa-angle-up')
+     div.col-4
+    //- HUD
+    //- canvas Control line #2
+    //-
+    div(class='row justify-content-center', id='canvasControl')
+     div.col-4
+      a(href='#', class='', id='canvasUp')
+       i(class='fa fa-2x fa-angle-left')
+     div.col-4
+     div.col-4
+      a(href='#', class='', id='canvasUp')
+       i(class='fa fa-2x fa-angle-right')
+    //- HUD
+    //- canvas Control line #3
+    //-
+    div(class='row justify-content-center', id='canvasControl')
+     div.col-4
+     div.col-4
+      a(href='#', class='', id='canvasUp')
+       i(class='fa fa-2x fa-angle-down')
+     div.col-4
+
+  //- ==================================================
+  //- VIS NETWORK CONTAINER 
+  //- ==================================================
+  div#patternLanguage
+
+//-comment
