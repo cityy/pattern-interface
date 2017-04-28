@@ -21,11 +21,16 @@ var db = new ODatabase({
    name:     'patternlanguage'
 });
 
-db.open().then(function() {
+/*db.open().then(function() {
    return db.query('SELECT FROM V LIMIT 1');
 }).then(function(res){
    console.log(res.length);
    db.close().then(function(){
       console.log('closed');
    });
-});
+});*/
+
+//console.log(db);
+module.exports = { db };
+
+

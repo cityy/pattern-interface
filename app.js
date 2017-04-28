@@ -10,7 +10,8 @@ var users = require('./routes/users');
 
 var app = express();
 
-require('./sv_orientdb.js');
+var oDB = require('./sv_orientdb.js');
+//console.log(oDB.db);
 //var vis_ = require('./src/js/vis_network.js');
 
 
@@ -28,6 +29,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
+// OrientDB Routes
+app.get('/nodes', function(req, res){
+	//oDB.db.open().then(function(){ 
+		//return 
+		var rec = oDB.db.record.get('#33:0').then(function(record){
+			res.send( record.name ); 	
+		})
+		
+	//}).then(function( dbres ){ // then() is a promise function that only executes on succesful return
+		//res.send('Request all the things from the server. ' + dbres );
+		//oDB.db.close().then(function(){ console.log('closed'); });
+	//});
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
