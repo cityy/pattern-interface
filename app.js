@@ -10,6 +10,10 @@ var users = require('./routes/users');
 
 var app = express();
 
+require('./sv_orientdb.js');
+//var vis_ = require('./src/js/vis_network.js');
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');

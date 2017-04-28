@@ -16,9 +16,11 @@
     "font-awesome-webpack": "0.0.5-beta.2",
     "jquery": "^3.2.1",
     "morgan": "~1.8.1",
+    "orientjs": "^2.2.5",
     "pug": "~2.0.0-beta11",
     "serve-favicon": "~2.4.2",
-    "tether": "^1.4.0"
+    "tether": "^1.4.0",
+    "vis": "^4.19.1"
   },
   "devDependencies": {
     "css-loader": "^0.28.0",
