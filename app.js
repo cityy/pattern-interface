@@ -11,6 +11,7 @@ var users = require('./routes/users');
 var app = express();
 
 var oDB = require('./sv_orientdb.js');
+
 //console.log(oDB.db);
 //var vis_ = require('./src/js/vis_network.js');
 
@@ -30,18 +31,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 // OrientDB Routes
-app.get('/nodes', function(req, res){
-	//oDB.db.open().then(function(){ 
-		//return 
-		var rec = oDB.db.record.get('#33:0').then(function(record){
-			res.send( record.name ); 	
-		})
-		
-	//}).then(function( dbres ){ // then() is a promise function that only executes on succesful return
-		//res.send('Request all the things from the server. ' + dbres );
-		//oDB.db.close().then(function(){ console.log('closed'); });
-	//});
+
+app.get('/nodes', function(req, res){ // request for all the nodes
+	oDB.db.class.get('pattern').then( function(pattern){
+		pattern.list().then( function(records){ // promises records of class pattern, records is an associative array
+			//console.log ( records );
+			res.send( records );
+		});
+	}); // db.class.get('pattern')
 });
+
+app.get('/nodes/:clusterId/:recordId', function(req, res){
+	oDB.db.class.get('pattern').then( function(pattern){
+		pattern.list().then( function(records){ // records is an associative array
+		});
+	}); // db.class.get('pattern')	
+}); // app.get(/nodes/:clusterId/:recordId)
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

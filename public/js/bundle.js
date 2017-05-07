@@ -15733,106 +15733,147 @@ module.exports = g;
 /***/ (function(module, exports, __webpack_require__) {
 
 var vis = __webpack_require__(17);
-var nodesObj, edgesObj, currentNodeCount, network, initialNodeCount;
-initialNodeCount = 2; // this sets the initial amount of nodes
-currentNodeCount = initialNodeCount;
+var nodesObj, edgesObj, currentNodeCount, network;
+network = {};
 
-function initNetwork(){
+/* ==================================================
+/* CREATE THE NODES & EDGES ARRAYS USING DataSet()
+/* ==================================================
+*/
 
-    var nodesArray, edgesArray;
+function getNodes(url){
+    return new Promise( function (resolve, reject){
+        let visDbReq = new XMLHttpRequest(); // http request for getting nodes from the database
+        visDbReq.open('GET', url, true); // initialize the request
+        
+        visDbReq.onload = function(){ // check the status
+            if ( visDbReq.status == 200 ){ resolve(visDbReq.response); }
+            else{ reject(Error(visDbReq.statusText)); }
+        };
+        visDbReq.onerror = function(){ // handle network errors
+            reject(Error('Network Error'));
+        };
+        visDbReq.send(null); // send the request, takes Parameters for POST requests                
+    });
+} // getNodes(url);
 
-    /* ==================================================
-    /* CREATE THE NODES & EDGES ARRAYS USING DataSet()
-    /* ==================================================
-    */
+getNodes('/nodes').then(function(response){
+    let allNodes = JSON.parse( response );
+    let nodesArray, edgesArray;
+    nodesArray = []; // array of Node Objects
+    edgesArray = []; // array of Edge Objects
+    currentNodeCount = allNodes.length;
+    //console.log( currentNodeCount );
 
-        nodesArray = []; // array of Node Objects
-        edgesArray = []; // array of Edge Objects
+    for ( let i = 0; i < currentNodeCount; i++ ){
+        // objects to push to the nodes/edges arrays
+        let node = {}; 
+        let edge = {};
 
-        for ( let i = 0; i < initialNodeCount; i++ ){
-            // objects to push to the nodes/edges arrays
-            let node = {}; 
-            let edge = {};
+        // create initial Nodes
+        node.id = allNodes[i].id; // first nodeId = 0, second nodeId = 1, ...
+        node.label = allNodes[i].label + ' id #' + allNodes[i].id;
+        //console.log(node);
+        nodesArray.push( node ); // append each i to the nodes Array
 
-            // create initial Nodes
-            node.id = i; // first nodeId = 0, second nodeId = 1, ...
-            node.label = 'Initial Pattern id:' + i;
-            nodesArray.push( node ); // append each i to the nodes Array   
-
-            // create initial edges
-            if (i > 0) {
-                edge.from = i-1; // set previous node as edge start
-                edge.to = i;  // set this node as edge end
-                edgesArray.push( edge ); // push edge to edges Array, produces a linear connection of initial nodes
-            }
-        }     
-
-        // convert Edges and Nodes Arrays to Objects
-        nodesObj = new vis.DataSet(nodesArray);
-        edgesObj = new vis.DataSet(edgesArray); 
+        // create initial edges
+        if (i > 0) {
+            edge.from = i-1; // set previous node as edge start
+            edge.to = i;  // set this node as edge end
+            edgesArray.push( edge ); // push edge to edges Array, produces a linear connection of initial nodes
+        } //  if i > 0
+    } // for i < currentNodeCount
+    // convert Edges and Nodes Arrays to Objects
+    nodesObj = new vis.DataSet(nodesArray);
+    edgesObj = new vis.DataSet(edgesArray);
 
     /* ==================================================
     /* GET THE NODE NETWORK CONTAINER DIV
     /* ==================================================
     */
 
-        // create a network
-        var container = document.getElementById('patternLanguage');
+    var container = document.getElementById('patternLanguage');
 
     /* ==================================================
     /* 05 GATHER THE NODES/EDGES DATA AND SET OPTIONS
     /* ==================================================
     */
 
-        var data = {
-            nodes: nodesObj,
-            edges: edgesObj
-        };
+    var data = {
+        nodes: nodesObj,
+        edges: edgesObj
+    };
 
 
-        var options = {
-            interaction:{
-                multiselect: true,
+    var options = {
+        interaction:{
+            multiselect: true,
+        },
+        layout: {
+            /*hierarchical: {
+                direction: 'UD'
+            }*/
+        },
+        // canvas option
+        configure: {                 // http://visjs.org/docs/network/configure.html
+            enabled: false,         // toggle the config interface
+            filter: true,
+           // container: undefined, // allows to put configure list in another html container
+            showButton: true,       // show generation options button at the bottom of the configurator
+                                    // allows to generate js objects for use in the script
+        },
+        nodes: {                    // http://visjs.org/docs/network/nodes.html
+            shape: 'box', 
+            shapeProperties:{
+                borderRadius: 3,
             },
-            layout: {
-                /*hierarchical: {
-                    direction: 'UD'
-                }*/
+            borderWidth: 0,
+            borderWidthSelected: 1,
+            font: {
+                face: 'Sofia Pro Soft',
+                color: '#FFFFFF',
             },
-            // canvas option
-            configure: {                 // http://visjs.org/docs/network/configure.html
-                enabled: false,         // toggle the config interface
-                filter: true,
-               // container: undefined, // allows to put configure list in another html container
-                showButton: true,       // show generation options button at the bottom of the configurator
-                                        // allows to generate js objects for use in the script
+            color: {
+                background: '#010101',
+                highlight: {
+                    background: '#107896',
+                    border: '#1287A8'
+                }
             },
-            nodes: {                    // http://visjs.org/docs/network/nodes.html
-                shape: 'circle',          
-                margin: 10,             // text label margin
+            margin: 10,             // text label margin
+        },
+        edges:{
+            width: 12,
+            selectionWidth: 0,
+            color: {
+                color: '#010101',
+                highlight: '#010101'
             },
-            physics: {                  // http://visjs.org/docs/network/physics.html
-              barnesHut: {              // for the barnesHut solver (see 'solver' module)
-                avoidOverlap: 0.5,      // control the node overlap 0...1 
-              }  
-            },
-            /* Other Modules:
-            /* edges: {}                // http://visjs.org/docs/network/edges.html
-            /* groups: {}               // http://visjs.org/docs/network/groups.html
-            /* interaction: {}          // http://visjs.org/docs/network/interaction.html
-            /* layout: {}               // http://visjs.org/docs/network/layout.html
-            /* manipulation: {}         // http://visjs.org/docs/network/manipulation.html
-            /*
-            /* Other Otions:
-            /* autoResize: true         // detect when the container is resized
-            /* height:
-            /* width:
-            /* locale: en               // language
-            /* locales:                 // custom translations
-            /* clickToUse:              // network only handles events when :active
-            */ 
+            scaling:{
+            }
+        },
+        physics: {                  // http://visjs.org/docs/network/physics.html
+          barnesHut: {              // for the barnesHut solver (see 'solver' module)
+            avoidOverlap: 0.5,      // control the node overlap 0...1 
+          }  
+        },
+        /* Other Modules:
+        /* edges: {}                // http://visjs.org/docs/network/edges.html
+        /* groups: {}               // http://visjs.org/docs/network/groups.html
+        /* interaction: {}          // http://visjs.org/docs/network/interaction.html
+        /* layout: {}               // http://visjs.org/docs/network/layout.html
+        /* manipulation: {}         // http://visjs.org/docs/network/manipulation.html
+        /*
+        /* Other Otions:
+        /* autoResize: true         // detect when the container is resized
+        /* height:
+        /* width:
+        /* locale: en               // language
+        /* locales:                 // custom translations
+        /* clickToUse:              // network only handles events when :active
+        */ 
 
-        };
+    };
 
     /* ==================================================
     /* 06 INITIALIZE THE GRAPH USING vis.Network()
@@ -15840,11 +15881,16 @@ function initNetwork(){
     */
 
     network = new vis.Network(container, data, options);
-    return network;
-}
+    //console.log(network);
+
+    console.log(network);
+
+    // NETWORK SELECT EVENTS
+    network.on('selectNode', function(){ checkHudDisable(); });
+    network.on('deselectNode', function(){ checkHudDisable(); });
+}); //getNodes()
 
 
-// INTERNAL FUNCTIONS
 function checkHudDisable() { // check if HUD buttons need to be disabled, depending on what is selected
     let selectedNodes = network.getSelectedNodes();
 
@@ -15877,9 +15923,10 @@ function checkHudDisable() { // check if HUD buttons need to be disabled, depend
 
 //MODULE EXPORTS
 var exports = module.exports = {};
-exports.network = initNetwork();
+exports.network = network;
 exports.addNode = function addNode() {
-                    let newId = initialNodeCount++;
+                    let newId = currentNodeCount++;
+                    currentNodeCount++;
                     let selectedNodes = network.getSelectedNodes(); // array
                     let newSelection = [newId];
 
@@ -15912,9 +15959,6 @@ exports.connectSelectedNodes = function connectSelectedNodes(){
                     }
                 };
 
-// NETWORK SELECT EVENTS
-network.on('selectNode', function(){ checkHudDisable(); });
-network.on('deselectNode', function(){ checkHudDisable(); });
 
 /***/ }),
 /* 7 */
@@ -68687,17 +68731,6 @@ connectNodesLink.addEventListener("click",function(){
     } 
 });*/
 
-
-
-var xhr = new XMLHttpRequest(); // create new request
-
-xhr.onreadystatechange = function() { // Listener: when the request state changes
-    if (xhr.readyState == XMLHttpRequest.DONE) { // check if the request is done
-        console.log(xhr.responseText); // alert the response html
-    }
-}
-xhr.open('GET', '/nodes', true); // initialize the request
-xhr.send(null); // send the request, takes Parameters for POST requests
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ })

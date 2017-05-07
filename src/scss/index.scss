@@ -8,7 +8,15 @@
 	z-index: 1;
 }
 
-html, body{height: 100%;}
+html, body{height: 100%; font-family: Sofia Pro Soft;}
+
+a, a:visited, a:active, a:focus{
+	color: #010101;
+}
+
+a:hover{
+	color:#107896;
+}
 
 #hud{
 	z-index: 10;
@@ -17,6 +25,7 @@ html, body{height: 100%;}
 	left:50px;
 	color:#CCC;
 	width: 100px;
+	text-align: center;
 
 	.container-fluid{ padding: 0; }
 	.row{ margin-bottom:25px; }

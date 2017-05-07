@@ -5995,7 +5995,14 @@ a.text-gray-dark:focus, a.text-gray-dark:hover {
   z-index: 1; }
 
 html, body {
-  height: 100%; }
+  height: 100%;
+  font-family: Sofia Pro Soft; }
+
+a, a:visited, a:active, a:focus {
+  color: #010101; }
+
+a:hover {
+  color: #107896; }
 
 #hud {
   z-index: 10;
@@ -6003,7 +6010,8 @@ html, body {
   top: 50px;
   left: 50px;
   color: #CCC;
-  width: 100px; }
+  width: 100px;
+  text-align: center; }
   #hud .container-fluid {
     padding: 0; }
   #hud .row {
