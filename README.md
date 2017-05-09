@@ -25,7 +25,7 @@ Ferdinand List - ferdinand.list at gmail dot com
 ### Backend 
 - [ ] use a database to generate and handle nodes / edges (OrientDB)
 	- [X] initialize nodes and edges from the database
-	- [  ] operate all edge/node updates on the database
+	- [ ] operate all edge/node updates on the database
 - [ ] add users
 - [ ] add user projects / user languages
 
