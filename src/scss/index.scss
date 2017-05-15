@@ -44,3 +44,16 @@ a:hover{
 		.col-4{ padding: 0; margin: 0; }
 	} //#canvasControl
 }  //#hud
+
+#editForm{
+	z-index: 10;
+	position: fixed;
+	top: 50px;
+	right:50px;
+	color:#CCC;
+	width: 100px;
+	text-align: center;
+
+	.container-fluid{ padding: 0;}
+	.row{ margin-bottom: 25px; }
+}

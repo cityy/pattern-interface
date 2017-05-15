@@ -15,18 +15,15 @@ require("font-awesome-webpack");
 var addNodeLink = document.getElementById("addNode");
 var deleteNodesLink = document.getElementById("deleteNodes");
 var connectNodesLink = document.getElementById("connectNodes");
+var editNodeLink = document.getElementById('editNode');
 
-addNodeLink.addEventListener( "click", function() {
-	vis_.addNode();
-}); 
+addNodeLink.addEventListener( "click", function() { vis_.addNode(); }); 
 
-deleteNodesLink.addEventListener("click", function(){
-	vis_.deleteSelectedNode();
-});
+deleteNodesLink.addEventListener("click", function(){ vis_.deleteSelectedNode(); });
 
-connectNodesLink.addEventListener("click",function(){
-	vis_.connectSelectedNodes();
-});
+connectNodesLink.addEventListener("click",function(){ vis_.connectSelectedNodes(); });
+
+editNodeLink.addEventListener("click", function(){ vis_.editSelectedNode(); })
 
 
 /*$(document).click(function(e) {

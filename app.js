@@ -28,8 +28,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 
-
-
 // =========================
 // OrientDB Routes
 // =========================
@@ -47,12 +45,6 @@ app.get('/nodes', function(req, res){ // request for all the nodes
 app.get('/edges', function(req, res){
 	oDB.db.class.get('patternconnections').then(function(patternconnections){
 		patternconnections.list().then(function(records){
-			/*for(var i in records){
-				console.log('Edge #' + i + ' with id: ' + records[i]['@rid']);
-				console.log('From: #'+ records[i].out.cluster + ':' + records[i].out.position);
-				console.log('To: #'+ records[i].in.cluster + ':' + records[i].in.position);
-				console.log('================================');
-			}*/
 			res.send( records );
 		});
 	});
@@ -73,11 +65,11 @@ app.get('/nodes/:clusterId/:recordId', function(req, res){
 app.post('/nodes', function(req, res){
 	oDB.db.class.get('pattern').then(function(pattern){
 		pattern.create({
-			id: req.body.id,
+			vId: req.body.vId,
 			name: req.body.name,
 			label: req.body.label
 		}).then( function(newPattern) {
-			res.send('Pattern ' + newPattern.name + ' with the id ' + newPattern.id + ' added to the database.');
+			res.send('Pattern ' + newPattern.name + ' with the id ' + newPattern.vId + ' added to the database.');
 		});
 	});
 });
@@ -85,51 +77,78 @@ app.post('/nodes', function(req, res){
 
 // HANDLE DELETENODES REQUEST
 app.delete('/nodes', function(req, res){
-	var ids = req.body.ids; // array of ids
+	var vIds = req.body.vIds; // array of ids
 	var promises = []; // for collection of all promises
-
-	function deleteNode(id){ 
-    // promise that deletes a vertex from orientDB
-		return new Promise(function(resolve, reject){
-			oDB.db.delete('VERTEX', 'pattern').where('id=' + id).one();
-			resolve(id); // promise return value
+	function deleteNode(vId){ 
+		return new Promise(function(resolve, reject){ // promise that deletes a vertex from orientDB
+			oDB.db.delete('VERTEX', 'pattern').where('vId=' + vId).one();
+			resolve(vId); // promise return value
 		}); 
 	}
-  	// for earch id
-	for ( var i in ids ) {
-    // push the deleteNode promise to the promises array
-		promises.push( deleteNode(ids[i]));
+	for ( var i in vIds ) {
+		promises.push( deleteNode(vIds[i])); // push the deleteNode promise to the promises array
 	}
   	//Promise.all() resolves when all promises in the array resolved
 	Promise.all(promises).then(function(dataArr){ 
 		res.send('Deleted the following Patterns: ' + dataArr);
 	}).catch(function(err){ console.log(err) });
-}); // app.delete(...)
+}); // app.delete(/nodes)
+
+
+app.delete('/edges', function(req, res){
+	var vIds = req.body.vIds; 
+	var promises = []; // for collection of all promises
+	function deleteNode(vId){ 
+		return new Promise(function(resolve, reject){ // promise that deletes a vertex from orientDB
+			oDB.db.delete('EDGE', 'patternconnections').where('vId=' + vId).one();
+			resolve(vId); // promise return value
+		}); 
+	}
+	for ( var i in vIds ) {
+		promises.push( deleteNode(vIds[i])); // push the deleteNode promise to the promises array
+	}
+  	//Promise.all() resolves when all promises in the array resolved
+	Promise.all(promises).then(function(dataArr){ 
+		res.send('Deleted the following Edges: ' + dataArr);
+	}).catch(function(err){ console.log(err) });
+}); // app.delete(/edges)
 
 
 // HANDLE CONNECTNODES REQUESTS
 app.post('/edges', function(req, res){
-	//console.log( req.body );
-
-	let fromId = req.body.from;
+	console.log( req.body );
+	let fromId = req.body.from; // can be an array
 	let toId = req.body.to;
-
-	let fromNode = oDB.db.select().from('pattern').where({id: fromId}).all().then(function(selectFrom){
-		let toNode = oDB.db.select().from('pattern').where({id: toId}).all().then(function(selectTo){
-			let fromRid = '#' + selectFrom[0]['@rid'].cluster + ':' + selectFrom[0]['@rid'].position;
-			let toRid = '#' + selectTo[0]['@rid'].cluster + ':' + selectTo[0]['@rid'].position;
-
-			oDB.db.create('EDGE', 'patternconnections').from(fromRid).to(toRid).set({
-				fromId: fromId,
-				toId: toId,
-			}).one().then( function(newEdge){
-				res.send('Created Edge:' + newEdge);
+	let vId = req.body.edgevId;
+	for ( var i in fromId ){
+		oDB.db.select().from('pattern').where({vId: fromId[i]}).all().then(function(selectFrom){
+			oDB.db.select().from('pattern').where({vId: toId}).all().then(function(selectTo){
+				let fromRid = '#' + selectFrom[0]['@rid'].cluster + ':' + selectFrom[0]['@rid'].position;
+				let toRid = '#' + selectTo[0]['@rid'].cluster + ':' + selectTo[0]['@rid'].position;
+				vId = +vId + +i;
+				console.log(vId);
+				oDB.db.create('EDGE', 'patternconnections').from(fromRid).to(toRid).set({ 
+					fromId: fromId[i], // save nodvIds (not the rids)
+					toId: toId,
+					vId: vId
+				}).one().then( function(newEdge){
+					res.send('Created Edge ' + newEdge.vId + ' from ' + newEdge.fromId + ' to ' + newEdge.toId);
+				}).catch(function(err){console.log(err)});
 			});
 		});
-	});
+	} // for
 });
 
-
+// HANDLE EDITNODE REQUESTS
+app.put('/nodes', function(req, res){
+	let vId = req.body.id;
+	oDB.db.select().from('pattern').where({vId: vId}).all().then(function(selectedNode){
+		//console.log(selectedNode);
+		let rid = '#' + selectedNode[0]['@rid'].cluster + ':' + selectedNode[0]['@rid'].position;
+		oDB.db.update(rid).set(req.body).scalar();
+		res.send('Updated Pattern: ' + vId);
+	});
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

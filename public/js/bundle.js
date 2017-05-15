@@ -15733,21 +15733,69 @@ module.exports = g;
 /***/ (function(module, exports, __webpack_require__) {
 
 var vis = __webpack_require__(17);
-var currentNodeCount, network, currentIds;
+var network;
 network = {};
-currentIds = [];
 var nodesObj = {};
 var edgesObj = {};
 
-/* ==================================================
-/* CREATE THE NODES & EDGES ARRAYS USING DataSet()
-/* ==================================================
-*/
+// =========================================================
+// FUNCTIONS TO HANDLE DATABASE INTERACTION / HTTP REQUESTS
+// =========================================================
+
+function deleteAll(url, data){
+    return new Promise( function (resolve, reject) {
+        var f = {
+            post: function(i){
+                var promise = new Promise( function(resolve, reject){
+                    var visDbReq = new XMLHttpRequest();
+                    visDbReq.open('DELETE', url[i], true);
+                    visDbReq.setRequestHeader("Content-type", "application/json; charset=utf-8");
+                    visDbReq.onload = function() {
+                        if (visDbReq.status === 200) { resolve(visDbReq.responseText); }
+                        else { console.log('Error' + visDbReq.statusText); } 
+                    } // onload()
+                    visDbReq.send( JSON.stringify(data) );
+                }); // var promise
+                return promise;
+            } // post method
+        } // obj f
+        var promises = [];
+        for (let i = 0; i < url.length; i++){
+            promises.push( f.post(i) );
+        }
+        Promise.all(promises).then( function(dataArr){
+            resolve( dataArr );
+        });
+    }); // return    
+} // deleteAll(url);
+
+function postAll(url, data){ // url is an array
+    return new Promise( function (resolve, reject) {
+        var f = {
+            post: function(i){
+                var promise = new Promise(function(resolve, reject){
+                    var visDbReq = new XMLHttpRequest();
+                    visDbReq.open('POST', url[i], true);
+                    visDbReq.setRequestHeader("Content-type", "application/json; charset=utf-8");
+                    visDbReq.onload = function() {
+                        if (visDbReq.status === 200) { resolve(visDbReq.responseText); }
+                        else { console.log('Error' + visDbReq.statusText); } 
+                    } // onload()
+                    visDbReq.send( JSON.stringify(data) );
+                }); // var promise
+                return promise;
+            } // post method
+        } // obj f
+        var promises = [];
+        for (let i = 0; i < url.length; i++){ promises.push( f.post(i) ); }
+        Promise.all(promises).then(function(dataArr){ resolve( dataArr ); });
+    }); // return
+} // postAll(url);
 
 function getAll(url){ // url is an array
     return new Promise( function (resolve, reject) {
         var f = {
-            send: function(i){
+            get: function(i){
                 var promise = new Promise(function(resolve, reject){
                     var visDbReq = new XMLHttpRequest();
                     visDbReq.open('GET', url[i]);
@@ -15758,58 +15806,100 @@ function getAll(url){ // url is an array
                     visDbReq.send(null);
                 }); // var promise
                 return promise;
-            } // function(i)
+            } // get method
         } // obj f
-
         // array that holds all the request promises
         var promises = []; 
         // for each requested url, push one response
         for (let i = 0; i < url.length; i++){
-            promises.push( f.send(i) );
+            promises.push( f.get(i) );
         }
         // if all sub promises are done, resolve the getAll promise
         Promise.all(promises).then(function(dataArr){
-            resolve(dataArr); 
+            for (let i in dataArr){
+                dataArr[i] = JSON.parse(dataArr[i]);
+            }
+            resolve( dataArr ); 
         });
     }); // return
 } // getAll(url);
 
+function updateAll(url, data){
+    return new Promise( function (resolve, reject) {
+        var f = {
+            put: function(i){
+                var promise = new Promise( function(resolve, reject){
+                    var visDbReq = new XMLHttpRequest();
+                    visDbReq.open('PUT', url[i], true);
+                    visDbReq.setRequestHeader("Content-type", "application/json; charset=utf-8");
+                    visDbReq.onload = function() {
+                        if (visDbReq.status === 200) { resolve(visDbReq.responseText); }
+                        else { console.log('Error' + visDbReq.statusText); } 
+                    } // onload()
+                    visDbReq.send( JSON.stringify(data) );
+                }); // var promise
+                return promise;
+            } // post method
+        } // obj f
+        var promises = [];
+        for (let i = 0; i < url.length; i++){
+            promises.push( f.put(i) );
+        }
+        Promise.all(promises).then( function(dataArr){
+            resolve( dataArr );
+        });
+    }); // return   
+} //updateAll(url, data)
 
+// function to check what is the next id when adding a new node or edge
+function getIds(dataSet){
+    let newId;
+    let currentIds = [];
+    let currentDataCount = dataSet.length;
+    if(currentDataCount > 0){ // get the currently used ids
+        for (let i = 0; i < currentDataCount; i++ ) { 
+            currentIds[i] = dataSet[i].vId; 
+        }
+        //console.log('currentIds: ' + currentIds);
+        currentIds.sort(function(a,b){return b-a}); // sort currently used ids in descending order
+        newId = currentIds[0] + 1; // newId is the currently highest id +1
+    }
+    else{ newId = 1; } // if there are no nodes, start with id=0
+    //console.log('newId: ' + newId);
+    return newId;
+}
+
+// =========================================================
+// INITIALIZING THE GRAPH - GET ALL NODES & EDGES FROM DB
+// =========================================================
 
 getAll( ["/nodes", "/edges"] ).then(function(responseArr){
-    let allNodes = JSON.parse( responseArr[0] );
-    let allEdges = JSON.parse ( responseArr[1] );
+    let allNodes = responseArr[0]; // get nodes from db
+    let allEdges = responseArr[1]; // get edges from db
     var nodesArray = []; // array of Node Objects
     var edgesArray = []; // array of Edge Objects
-    // if there is nodes, set current node counter - else set current node counter to 0
-    if(allNodes.length){ currentNodeCount = allNodes.length; }
-    else{ currentNodeCount = 0; }
+
     // loop through the nodes responded by the server
-    for ( let i = 0; i < currentNodeCount; i++ ){
+    for ( let i = 0; i < allNodes.length ; i++ ){
         // create initial Nodes
         let node = {};
-        node.id = allNodes[i].id; // first nodeId = 0, second nodeId = 1, ...
-        node.label = allNodes[i].label + ' id #' + allNodes[i].id;
-        //console.log(node);
+        node.id = allNodes[i].vId; // first nodvId = 0, second nodvId = 1, ...
+        node.label = allNodes[i].label + ' id #' + allNodes[i].vId;
         nodesArray.push( node ); // append each i to the nodes Array
-    } // for i < currentNodeCount
+    } // for i < allNodes.length
     // create initial edges
-    if (allEdges) {
+    if (allEdges.length > 0) {
         for(let i = 0; i < allEdges.length; i++){
-            /*console.log('EDGE:' + allEdges[i]['@rid']);
-            console.log('From:' + allEdges[i].out);
-            console.log('To:' + allEdges[i].in);
-            console.log(JSON.stringify(allEdges[i]));*/
             let edge = {};
             edge.from = allEdges[i].fromId;
             edge.to = allEdges[i].toId;
+            edge.id = allEdges[i].vId;
             edgesArray.push( edge );
         } // for
     } //  if i > 0
-    console.log( edgesArray );
     // convert Edges and Nodes Arrays to Objects
     nodesObj = new vis.DataSet( nodesArray );
-    edgesObj = new vis.DataSet(edgesArray);
+    edgesObj = new vis.DataSet( edgesArray );
 
     // ==================================================
     // GET THE NODE NETWORK CONTAINER DIV
@@ -15872,20 +15962,6 @@ getAll( ["/nodes", "/edges"] ).then(function(responseArr){
             avoidOverlap: 0.5,      // control the node overlap 0...1 
           }  
         },
-        // Other Modules:
-        // edges: {}                // http://visjs.org/docs/network/edges.html
-        // groups: {}               // http://visjs.org/docs/network/groups.html
-        // interaction: {}          // http://visjs.org/docs/network/interaction.html
-        // layout: {}               // http://visjs.org/docs/network/layout.html
-        // manipulation: {}         // http://visjs.org/docs/network/manipulation.html
-        //
-        // Other Otions:
-        // autoResize: true         // detect when the container is resized
-        // height:
-        // width:
-        // locale: en               // language
-        // locales:                 // custom translations
-        // clickToUse:              // network only handles events when :active
     };
 
     // ==================================================
@@ -15929,114 +16005,107 @@ function checkHudDisable() { // check if HUD buttons need to be disabled, depend
     } //switch
 } // checkHudDisable();     
 
-
 var exports = module.exports = {};
 exports.network = network;
 exports.addNode = function addNode() {
                 getAll(['/nodes']).then(function(response){
-                    let allNodes = JSON.parse( response[0] );
-                    let newId;
-                    // if there are nodes
-                    if(currentNodeCount > 0){
-                        // get the currently used ids
-                        for (let i=0; i < currentNodeCount; i++ ) {
-                            currentIds[i] = allNodes[i].id;
-                        }
-                        // sort currently used ids in descending order
-                        currentIds.sort(function(a,b){return b-a});
-                        newId = currentIds[0] + 1;
-                    }
-                    // if there are no nodes start with id=0
-                    else{ newId = 0; }
+                    let allNodes = response[0];
+                    let newNodeId, newEdgeId;      
+                    let selectedNodes = network.getSelectedNodes(); // array
+                    newNodeId = getIds(allNodes);
                     // new node's data object
                     let data = { 
-                        id: newId,
-                        name: 'newpattern' + currentNodeCount,
+                        vId: newNodeId,
+                        name: 'newpattern' + allNodes.length,
                         label: 'I was added to the database dynamically.'
                     };
-
-                    // create the http post request
-                    let postNodeReq = new XMLHttpRequest();
-                    postNodeReq.open('POST', '/nodes', true);
-                    postNodeReq.setRequestHeader("Content-type", "application/json; charset=utf-8");
-
-                    postNodeReq.addEventListener('load', function(event) {
-                          if (postNodeReq.status >= 200 && postNodeReq.status < 300) {
-                             console.log(postNodeReq.responseText);
-                          } else {
-                             console.warn(postNodeReq.statusText, postNodeReq.responseText);
-                          }
-                    });
-                    // send the request, parameters have to be in json format
-                    postNodeReq.send( JSON.stringify(data) ); 
-
-                    // create the new node in frontend
-                    nodesObj.add({ id: data.id, label: data.label + " id #" + data.id }); 
-                    currentNodeCount++;
-
-                    let selectedNodes = network.getSelectedNodes(); // array
-                    let newSelection = [data.id]; // add new node to selection
-
+                    // create the new node and the new edges in frontend
+                    nodesObj.add({ id: data.vId, label: data.label + " id #" + data.vId }); 
+                    let newSelection = [data.vId]; // add new node to selection
                     // if a node is selected, automatically connect the new node
-                    if( selectedNodes ){ 
-                        for (let i = 0; i < selectedNodes.length; i++){
-                            newSelection.push(selectedNodes[i]);
-                            edgesObj.add({from: selectedNodes[i], to: data.id});
-                        }
-                    }
-
+                    if( selectedNodes.length > 0 ){ 
+                        getAll(['/edges']).then(function(response){
+                            let allEdges = response[0];
+                            newEdgeId = getIds(allEdges);
+                            //console.log('selected Nodes (from): ' + selectedNodes);
+                            data.from = selectedNodes, // edges from (array)
+                            data.to = newNodeId; // edges to
+                            data.edgevId = newEdgeId;
+                            for (let i = 0; i < selectedNodes.length; i++){
+                                newSelection.push(data.from[i]);
+                                data.edgevId += i;
+                                edgesObj.add({id: data.edgevId, from: data.from[i], to: data.to});
+                            }
+                            postAll(['/nodes', '/edges'], data).then(function(response){ // save nodes and edges to backend
+                                console.log(response);
+                            }); //postAll(nodes,edges)
+                        }); //getAll(edges)
+                    } // if
+                    else{ postAll(['/nodes'], data); } // or if nothing was selected, post only nodes
                     network.setSelection({nodes: newSelection,});
                     checkHudDisable();
-                });
+                }); // getAll(nodes)
 }
 
 exports.deleteSelectedNode = function deleteSelectedNode(){
                     let selectedNodes = network.getSelectedNodes(); // array containing ids
-                    let deleteNodesReq = new XMLHttpRequest();
-                    let data = { ids: selectedNodes }; 
-
-                    deleteNodesReq.open('DELETE', '/nodes', true);
-                    deleteNodesReq.setRequestHeader("Content-type", "application/json; charset=utf-8");
-                    deleteNodesReq.addEventListener('load', function(event) {
-                          if (deleteNodesReq.status >= 200 && deleteNodesReq.status < 300) {
-                             console.log(deleteNodesReq.responseText);
-                          } else {
-                             console.warn(deleteNodesReq.statusText, deleteNodesReq.responseText);
-                          }
-                    });
-                    // send the request, parameters have to be in json format
-                    deleteNodesReq.send( JSON.stringify(data) ); 
-
-                    for (let i=0; i < selectedNodes.length; i++){
-                        nodesObj.remove({id: selectedNodes[i]}); // remove each selected node in frontend
-                        currentNodeCount--; // decrease nodecount for each deleted node
+                    let selectedEdges = network.getSelectedEdges();
+                    let selection = network.getSelection();
+                    let data = {};
+                    if (selectedNodes.length > 0){
+                        data = { vIds: selectedNodes }; 
+                        deleteAll(['/nodes'], data).then(function(response){
+                            console.log(response);
+                            for (let i=0; i < selectedNodes.length; i++){
+                                nodesObj.remove({id: selectedNodes[i]}); // remove each selected node in frontend
+                            }      
+                        });                  
+                    }
+                    else if (selectedEdges){
+                        data = { vIds: selectedEdges }; 
+                        deleteAll(['/edges'], data).then(function(response){
+                            console.log(response);
+                            for (let i=0; i < selectedEdges.length; i++){
+                                edgesObj.remove({id: selectedEdges[i]}); // remove each selected node in frontend
+                            }     
+                        });
                     }
                     checkHudDisable();
-                    
-                }
+}
 
 exports.connectSelectedNodes = function connectSelectedNodes(){
-                    let connectNodesReq = new XMLHttpRequest();
-                    let selectedNodes = network.getSelectedNodes();
-                    let data = { 
-                        from: selectedNodes[0],
-                        to: selectedNodes[1]
-                    }
-                    connectNodesReq.open('POST', '/edges', true);
-                    connectNodesReq.setRequestHeader("Content-type", "application/json; charset=utf-8");
-
-                    connectNodesReq.addEventListener('load', function(event) {
-                          if (connectNodesReq.status >= 200 && connectNodesReq.status < 300) {
-                             console.log(connectNodesReq.responseText);
-                          } else {
-                             console.warn(connectNodesReq.statusText, connectNodesReq.responseText);
-                          }
+                    getAll(['/edges']).then(function(response){
+                        let selectedNodes = network.getSelectedNodes();
+                        let allEdges = response[0];
+                        //console.log(allEdges.length);
+                        let newEdgvId = getIds(allEdges);
+                        console.log(newEdgvId);
+                        let data = { 
+                            from: [ selectedNodes[0] ],
+                            to: selectedNodes[1],
+                            edgevId: newEdgvId,
+                        }
+                        postAll(['/edges'], data).then(function(response){
+                            console.log( response );
+                        })
+                        // connect nodes in frontend
+                        edgesObj.add({id: data.edgevId, from: data.from[0], to: data.to});
                     });
-                    // send the request, parameters have to be in json format
-                    connectNodesReq.send( JSON.stringify(data) ); 
-                    // connect nodes in frontend
-                    edgesObj.add({from: data.from, to: data.to});
-                }
+}
+
+exports.editSelectedNode = function editSelectedNode(){
+    let editInput = document.getElementById('editInput');
+    let selectedNodeId = network.getSelectedNodes(); 
+    let selectedNode = nodesObj.get(selectedNodeId);
+    editInput.value = selectedNode[0].label;
+
+    document.getElementById('SaveEditButton').onclick = function(){
+        selectedNode[0].label = editInput.value;
+        nodesObj.update(selectedNode);
+        console.log('Saved Node ' + selectedNodeId);
+        updateAll(['/nodes'], selectedNode[0]);
+    }
+}
 
 /***/ }),
 /* 7 */
@@ -68788,18 +68857,15 @@ __webpack_require__(2);
 var addNodeLink = document.getElementById("addNode");
 var deleteNodesLink = document.getElementById("deleteNodes");
 var connectNodesLink = document.getElementById("connectNodes");
+var editNodeLink = document.getElementById('editNode');
 
-addNodeLink.addEventListener( "click", function() {
-	vis_.addNode();
-}); 
+addNodeLink.addEventListener( "click", function() { vis_.addNode(); }); 
 
-deleteNodesLink.addEventListener("click", function(){
-	vis_.deleteSelectedNode();
-});
+deleteNodesLink.addEventListener("click", function(){ vis_.deleteSelectedNode(); });
 
-connectNodesLink.addEventListener("click",function(){
-	vis_.connectSelectedNodes();
-});
+connectNodesLink.addEventListener("click",function(){ vis_.connectSelectedNodes(); });
+
+editNodeLink.addEventListener("click", function(){ vis_.editSelectedNode(); })
 
 
 /*$(document).click(function(e) {
