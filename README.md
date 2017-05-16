@@ -19,13 +19,15 @@ Ferdinand List - ferdinand.list at gmail dot com
 - [ ] save current language to database
 
 ### Frontend 
-- [ ] add a way to display pattern contents
+- [X] add a way to display pattern contents
+- [ ] make edit node window dragable and improve UI
+- [ ] use pattern diagrams as node icons
 - [ ] add hierarchy
 
 ### Backend 
-- [ ] use a database to generate and handle nodes / edges (OrientDB)
+- [X] use a database to generate and handle nodes / edges (OrientDB)
 	- [X] initialize nodes and edges from the database
-	- [ ] operate all edge/node updates on the database
+	- [X] operate all edge/node updates on the database
 - [ ] add users
 - [ ] add user projects / user languages
 
