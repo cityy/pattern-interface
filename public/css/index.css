@@ -6004,6 +6004,10 @@ a, a:visited, a:active, a:focus {
 a:hover {
   color: #107896; }
 
+#container {
+  position: absolute;
+  height: 100%; }
+
 #hud {
   z-index: 10;
   position: fixed;
@@ -6029,15 +6033,23 @@ a:hover {
       padding: 0;
       margin: 0; }
 
-#editForm {
+#editWindow {
   z-index: 10;
   position: fixed;
-  top: 50px;
-  right: 50px;
+  top: 33%;
+  right: 33%;
   color: #CCC;
   width: 100px;
-  text-align: center; }
-  #editForm .container-fluid {
+  text-align: center;
+  display: none;
+  background-color: white;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  -ms-user-select: none;
+  -khtml-user-select: none;
+  user-select: none; }
+  #editWindow .container-fluid {
     padding: 0; }
-  #editForm .row {
+  #editWindow .row {
     margin-bottom: 25px; }

@@ -150,7 +150,10 @@ getAll( ["/nodes", "/edges"] ).then(function(responseArr){
         // create initial Nodes
         let node = {};
         node.id = allNodes[i].vId; // first nodvId = 0, second nodvId = 1, ...
-        node.label = allNodes[i].label + ' id #' + allNodes[i].vId;
+        node.label = allNodes[i].label;
+        node.title = allNodes[i].title;
+        node.problem = allNodes[i].problem;
+        node.instruction = allNodes[i].instruction;
         nodesArray.push( node ); // append each i to the nodes Array
     } // for i < allNodes.length
     // create initial edges
@@ -212,6 +215,8 @@ getAll( ["/nodes", "/edges"] ).then(function(responseArr){
                 }
             },
             margin: 10,             // text label margin
+            widthConstraint: 150,
+            labelHighlightBold: false,
         },
         edges:{
             width: 12,
@@ -273,6 +278,7 @@ function checkHudDisable() { // check if HUD buttons need to be disabled, depend
 
 var exports = module.exports = {};
 exports.network = network;
+
 exports.addNode = function addNode() {
                 getAll(['/nodes']).then(function(response){
                     let allNodes = response[0];
@@ -282,11 +288,15 @@ exports.addNode = function addNode() {
                     // new node's data object
                     let data = { 
                         vId: newNodeId,
-                        name: 'newpattern' + allNodes.length,
-                        label: 'I was added to the database dynamically.'
+                        title: 'New Pattern #' + newNodeId,
+                        problem: 'New Problem ' + newNodeId,
+                        instruction: 'New Instruction ' + newNodeId,
+                        label: '',
                     };
+                    data.label = data.title + '\n\n' + data.problem + '\n' + data.instruction;
+
                     // create the new node and the new edges in frontend
-                    nodesObj.add({ id: data.vId, label: data.label + " id #" + data.vId }); 
+                    nodesObj.add({ id: data.vId, title: data.title, problem: data.problem, instruction: data.instruction, label: data.label}); 
                     let newSelection = [data.vId]; // add new node to selection
                     // if a node is selected, automatically connect the new node
                     if( selectedNodes.length > 0 ){ 
@@ -296,11 +306,11 @@ exports.addNode = function addNode() {
                             //console.log('selected Nodes (from): ' + selectedNodes);
                             data.from = selectedNodes, // edges from (array)
                             data.to = newNodeId; // edges to
-                            data.edgevId = newEdgeId;
+                            data.edgevId = [];
                             for (let i = 0; i < selectedNodes.length; i++){
                                 newSelection.push(data.from[i]);
-                                data.edgevId += i;
-                                edgesObj.add({id: data.edgevId, from: data.from[i], to: data.to});
+                                data.edgevId.push(newEdgeId+i);
+                                edgesObj.add({id: data.edgevId[i], from: data.from[i], to: data.to});
                             }
                             postAll(['/nodes', '/edges'], data).then(function(response){ // save nodes and edges to backend
                                 console.log(response);
@@ -310,6 +320,7 @@ exports.addNode = function addNode() {
                     else{ postAll(['/nodes'], data); } // or if nothing was selected, post only nodes
                     network.setSelection({nodes: newSelection,});
                     checkHudDisable();
+                    editNode();
                 }); // getAll(nodes)
 }
 
@@ -349,26 +360,51 @@ exports.connectSelectedNodes = function connectSelectedNodes(){
                         let data = { 
                             from: [ selectedNodes[0] ],
                             to: selectedNodes[1],
-                            edgevId: newEdgvId,
+                            edgevId: [ newEdgvId ],
                         }
                         postAll(['/edges'], data).then(function(response){
                             console.log( response );
                         })
                         // connect nodes in frontend
-                        edgesObj.add({id: data.edgevId, from: data.from[0], to: data.to});
+                        edgesObj.add({id: data.edgevId[0], from: data.from[0], to: data.to});
                     });
 }
 
 exports.editSelectedNode = function editSelectedNode(){
-    let editInput = document.getElementById('editInput');
-    let selectedNodeId = network.getSelectedNodes(); 
-    let selectedNode = nodesObj.get(selectedNodeId);
-    editInput.value = selectedNode[0].label;
 
-    document.getElementById('SaveEditButton').onclick = function(){
-        selectedNode[0].label = editInput.value;
-        nodesObj.update(selectedNode);
+editNode();
+
+}
+
+function editNode(){
+    let editWindow = document.getElementById('editWindow');
+    editWindow.style.display = 'block';
+
+    let selectedNodeId = network.getSelectedNodes(); // get array of selected nodes' ids
+    let selectedNode = nodesObj.get(selectedNodeId); // array of nodes by id
+
+    document.getElementById('patternTitleInput').value = selectedNode[0].title;
+    document.getElementById('patternProblemTxtArea').value = selectedNode[0].problem;
+    document.getElementById('patternInstructionTxtArea').value = selectedNode[0].instruction;
+
+    document.getElementById('saveEditButton').onclick = function(){
+        selectedNode[0].title = document.getElementById('patternTitleInput').value;
+        selectedNode[0].problem = document.getElementById('patternProblemTxtArea').value;
+        selectedNode[0].instruction = document.getElementById('patternInstructionTxtArea').value;
+        selectedNode[0].label = selectedNode[0].title + '\n\n' + selectedNode[0].problem + '\n' + selectedNode[0].instruction;
+        nodesObj.update(selectedNode); // update node on frontend
         console.log('Saved Node ' + selectedNodeId);
-        updateAll(['/nodes'], selectedNode[0]);
+        updateAll(['/nodes'], selectedNode[0]); // update node on DB
+        editWindow.style.display = 'none';
+        document.getElementById('saveEditButton').removeAttribute("onclick");
+        document.getElementById('cancelEditButton').removeAttribute("onclick");
     }
+
+    document.getElementById('cancelEditButton').onclick = function(){
+        editWindow.style.display = 'none';
+        document.getElementById('saveEditButton').removeAttribute("onclick");
+        document.getElementById('cancelEditButton').removeAttribute("onclick");
+    }
+
+    //return data;
 }

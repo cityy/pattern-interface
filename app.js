@@ -50,30 +50,20 @@ app.get('/edges', function(req, res){
 	});
 });
 
-
-// HANDLE A SINGLE RECORD REQUEST
-app.get('/nodes/:clusterId/:recordId', function(req, res){ 
-	oDB.db.class.get('pattern').then( function(pattern){
-		pattern.list().then( function(records){ // records is an associative array
-			res.send( records );
-		});
-	}); // db.class.get('pattern')	
-}); // app.get(/nodes/:clusterId/:recordId)
-
-
 // HANDLE ADDNODE REQUEST
 app.post('/nodes', function(req, res){
 	oDB.db.class.get('pattern').then(function(pattern){
 		pattern.create({
 			vId: req.body.vId,
-			name: req.body.name,
+			title: req.body.title,
+			problem: req.body.problem,
+			instruction: req.body.instruction,
 			label: req.body.label
 		}).then( function(newPattern) {
-			res.send('Pattern ' + newPattern.name + ' with the id ' + newPattern.vId + ' added to the database.');
+			res.send('Pattern ' + newPattern.title + ' with the id ' + newPattern.vId + ' added to the database.');
 		});
 	});
 });
-
 
 // HANDLE DELETENODES REQUEST
 app.delete('/nodes', function(req, res){
@@ -113,31 +103,42 @@ app.delete('/edges', function(req, res){
 	}).catch(function(err){ console.log(err) });
 }); // app.delete(/edges)
 
-
 // HANDLE CONNECTNODES REQUESTS
 app.post('/edges', function(req, res){
 	console.log( req.body );
 	let fromId = req.body.from; // can be an array
 	let toId = req.body.to;
-	let vId = req.body.edgevId;
-	for ( var i in fromId ){
-		oDB.db.select().from('pattern').where({vId: fromId[i]}).all().then(function(selectFrom){
-			oDB.db.select().from('pattern').where({vId: toId}).all().then(function(selectTo){
-				let fromRid = '#' + selectFrom[0]['@rid'].cluster + ':' + selectFrom[0]['@rid'].position;
-				let toRid = '#' + selectTo[0]['@rid'].cluster + ':' + selectTo[0]['@rid'].position;
-				vId = +vId + +i;
-				console.log(vId);
-				oDB.db.create('EDGE', 'patternconnections').from(fromRid).to(toRid).set({ 
-					fromId: fromId[i], // save nodvIds (not the rids)
-					toId: toId,
-					vId: vId
-				}).one().then( function(newEdge){
-					res.send('Created Edge ' + newEdge.vId + ' from ' + newEdge.fromId + ' to ' + newEdge.toId);
-				}).catch(function(err){console.log(err)});
-			});
-		});
-	} // for
-});
+	let vId = req.body.edgevId; // can be an array
+
+	var f = {
+		create: function(i){
+			var promise = new Promise(function(resolve, reject){
+				oDB.db.select().from('pattern').where({vId: fromId[i]}).all().then(function(selectFrom){
+					oDB.db.select().from('pattern').where({vId: toId}).all().then(function(selectTo){
+						let fromRid = '#' + selectFrom[0]['@rid'].cluster + ':' + selectFrom[0]['@rid'].position;
+						let toRid = '#' + selectTo[0]['@rid'].cluster + ':' + selectTo[0]['@rid'].position;
+						console.log(vId[i]);
+
+						oDB.db.create('EDGE', 'patternconnections').from(fromRid).to(toRid).set({ 
+							fromId: fromId[i], // save nodvIds (not the rids)
+							toId: toId,
+							vId: vId[i]
+						}).one().then( function(newEdge){
+							console.log('Created edge :' + newEdge);
+						}).catch(function(err){console.log(err)});
+					}); // selectTo
+				}); // selectFrom
+			}); // var promise
+		} // create: function(i)
+	} // obj f
+	var promises = [];
+	
+	for (let i = 0; i < vId.length; i++ ){ promises.push( f.create(i) ); }
+
+	Promise.all(promises).then(function(dataArr){
+		res.send('Created Edge ' + vId + ' from ' + fromId + ' to ' + toId);
+	}) // Promise.all
+}); //app.post(/edges)
 
 // HANDLE EDITNODE REQUESTS
 app.put('/nodes', function(req, res){
@@ -149,6 +150,15 @@ app.put('/nodes', function(req, res){
 		res.send('Updated Pattern: ' + vId);
 	});
 });
+
+// HANDLE A SINGLE RECORD REQUEST
+/*app.get('/nodes/:clusterId/:recordId', function(req, res){ 
+	oDB.db.class.get('pattern').then( function(pattern){
+		pattern.list().then( function(records){ // records is an associative array
+			res.send( records );
+		});
+	}); // db.class.get('pattern')	
+}); // app.get(/nodes/:clusterId/:recordId)*/
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

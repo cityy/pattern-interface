@@ -4,6 +4,7 @@ block content
   //- ==================================================
   //- HUD 
   //- ==================================================
+
   div#hud
    div.container-fluid
     //- HUD
@@ -67,13 +68,17 @@ block content
        i(class='fa fa-2x fa-angle-down')
      div.col-4
 
-  div#editForm
+  div(id='editWindow')
    div.container-fluid
     div(class='row justify-content-center')
      form
-      input(type='text' id="editInput" value="Text goes here")
-     button(type='submit' id='SaveEditButton')
-      | Save
+      input(name='Pattern Title' type='text' id='patternTitleInput' placeholder='Pattern title goes here')
+     form
+      textarea(name='Problem' type='text' id='patternProblemTxtArea' placeholder='Pattern Problem goes here')
+     form
+      textarea(name='Instruction' type='text' id='patternInstructionTxtArea' placeholder='Pattern Instruction goes here')
+     button(type='submit' id='saveEditButton')
+      | Save Pattern
      button(type='button' id='cancelEditButton')
       | Cancel
 
