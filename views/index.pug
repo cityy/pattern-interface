@@ -5,16 +5,35 @@ block content
   //- HUD 
   //- ==================================================
 
+  nav(class="navbar fixed-top navbar-toggleable-md")
+   button(class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation")
+    span(class="navbar-toggler-icon")
+   a(class="navbar-brand " href="#")
+    i(class="fa fa-circle-o")
+    | A Pattern Interface
+   div(class="collapse navbar-collapse" id="navbarNav")
+    ul(class="navbar-nav ml-auto")
+     li(class="nav-item" id='userinfo')
+      a(class="nav-link")
+       i(class='fa fa-user-o' id='usericon')
+       span(id='userNameLabel')
+        | User
+      a(class="nav-link" href='#' id='logoutLink')
+       | Logout
+     li(class="nav-item" id='loginRegister')
+      a(class="nav-link" href='#' id='loginLink')
+       | Login
+      a(class="nav-link" href='#' id='registerLink')
+       | Register
+     li(class="nav-item" id="projectSelection")
+      form(class="form-inline")
+       select(class="form-control form-control-sm" id="userprojects")
+        option Select Project..
+      a(class='nav-link' href='#')
+       i(class='fa fa-plus' id='addProject')
+
   div#hud
    div.container-fluid
-    //- HUD
-    //- LOGO
-    //-
-    div(class='row justify-content-center')
-     <h4> 
-      a(href='#', class='', id='logo')
-       | A PATTERN INTERFACE
-    //- HUD
     //- add Node
     //-
     div(class='row justify-content-center')
@@ -65,22 +84,108 @@ block content
      div.col-4
      div.col-4
       a(href='#', class='', id='canvasUp')
-       i(class='fa fa-2x fa-angle-down')
+       i(class='fa fa-2x fa-angle-down') 
      div.col-4
+
+
+
+  div(id='loginWindow')
+   //- Signup Form
+   form(id='loginForm' name='login' action='/login' method='post')
+    h3 Login
+    p Username or E-Mail:
+    input(type='text' id='username' name='username' placeholder='Enter username...')
+    | <br /> <br />
+    p Password:
+    input(type='password' id='password' name='password' placeholder='Enter password...')
+    | <br /> <br />
+    button(type='submit' id='loginButton')
+     | Login
+    button(type='button' id='cancelLoginButton')
+     | Cancel
+    | <br /> <br />
+    a(href='#' id='goToRegister')
+     | Register 
+    | - 
+    a(href='#' id='forgotpassword')
+     | Forgot password?
+
+   //- Login Notice
+   div(id='loginNotice')
+    h3 Login successful!
+    span 
+     | Welcome 
+    span(id='welcomeName')
+     | user
+    span
+     | ! <br /> <br />
+    button(type='button' id='loginDismiss')
+     | Get started!
+
+   //- Registration Form
+   form(id='registerForm' name='register' action='/local-reg' method='post') 
+    h3 Register
+    p Username:
+    input(type='text' id='username' name='username' placeholder='Enter username...')
+    | <br /> <br />
+    p E-Mail:
+    input(type='text' id='email'  name='email' placeholder='Enter E-mail address...')
+    | <br /> <br />
+    p Password:
+    input(type='password' id='password' name='password' placeholder='Enter password...')
+    | <br /> <br />
+    p Comfirm Password:
+    input(type='text' id='confirmpassword' name='confirmpassword' placeholder='Confirm password...')
+    | <br /> <br />
+    button(type='submit' id='registerButton')
+     | Register
+    button(type='button' id='cancelRegisterButton')
+     | Cancel
+    a(href='#' id='goToLogin')
+     | <br /> <br />  Already have an account? <br />Go to login.
+
+   //- Logout Notice
+   div(id='logoutNotice')
+    h3 Logout successful!
+    a(href='#' id='goBackToLogin')
+     | Go back to login. 
+    p <br /> <br />
+    button(type='button' id='logoutDismiss')
+     | Dismiss
+
 
   div(id='editWindow')
    div.container-fluid
     div(class='row justify-content-center')
      form
+      p Pattern Title:
       input(name='Pattern Title' type='text' id='patternTitleInput' placeholder='Pattern title goes here')
      form
+      p Pattern Observation:
       textarea(name='Problem' type='text' id='patternProblemTxtArea' placeholder='Pattern Problem goes here')
      form
+      p Pattern Instruction:
       textarea(name='Instruction' type='text' id='patternInstructionTxtArea' placeholder='Pattern Instruction goes here')
-     button(type='submit' id='saveEditButton')
-      | Save Pattern
-     button(type='button' id='cancelEditButton')
-      | Cancel
+     form(id='uploadForm' name='diagramImage' enctype="multipart/form-data" action="/imgUpload" method="post")
+      p Pattern Diagram: 
+      img(src='' id='patternDiagram')
+      input(type="file" id='uploadInput' name='diagramImage')
+      button(type='submit' id='saveEditButton')
+       | Save Pattern
+      button(type='button' id='cancelEditButton')
+       | Cancel
+
+  div(id='projectWindow')
+   div.container-fluid
+    div(class='row justify-content-center')
+     h3 Add new Project
+     form
+      p Project Title:
+      input(name='Project Title' type='text' id='newProjectTitleInput' placeholder='Project title')
+      button(type='button' id='saveNewProjectButton')
+       | Save Project
+      button(type='button' id='cancelProjectButton')
+       | Cancel
 
   //- ==================================================
   //- VIS NETWORK CONTAINER 

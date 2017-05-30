@@ -15,21 +15,25 @@ Ferdinand List - ferdinand.list at gmail dot com
 - [X] connect nodes
 	- [X] disable connect id more/less than 2 nodes are selected
 - [ ] zoom, zoomlevel
-- [ ] pan
-- [ ] save current language to database
 
 ### Frontend 
 - [X] add a way to display pattern contents
-- [ ] make edit node window dragable and improve UI
-- [ ] use pattern diagrams as node icons
-- [ ] add hierarchy
+- [X] make edit node window dragable and improve UI
+- [X] use pattern diagrams as node icons
+- [ ] add hierarchy (not sure I'll do this eventually)
+- [ ] introduce project based pattern sequences
+	- [ ] highlight sequence nodes and edges
+	- [ ] create entry point functionality
 
 ### Backend 
 - [X] use a database to generate and handle nodes / edges (OrientDB)
 	- [X] initialize nodes and edges from the database
 	- [X] operate all edge/node updates on the database
-- [ ] add users
+- [X] add users
 - [ ] add user projects / user languages
+	- [X] add functionality to create and select projects
+	- [ ] add functionality to edit and delete projects
+	- [ ] link projects to visJS and the database
 
 ### Content
 - [ ] add global language patterns

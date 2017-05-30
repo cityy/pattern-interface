@@ -3,6 +3,7 @@ var network;
 network = {};
 var nodesObj = {};
 var edgesObj = {};
+var imgDir = '../img/';
 
 // =========================================================
 // FUNCTIONS TO HANDLE DATABASE INTERACTION / HTTP REQUESTS
@@ -150,9 +151,12 @@ getAll( ["/nodes", "/edges"] ).then(function(responseArr){
         // create initial Nodes
         let node = {};
         node.id = allNodes[i].vId; // first nodvId = 0, second nodvId = 1, ...
+        node.x = allNodes[i].x;
+        node.y = allNodes[i].y;
         node.label = allNodes[i].label;
         node.title = allNodes[i].title;
         node.problem = allNodes[i].problem;
+        node.image = allNodes[i].image;
         node.instruction = allNodes[i].instruction;
         nodesArray.push( node ); // append each i to the nodes Array
     } // for i < allNodes.length
@@ -185,55 +189,68 @@ getAll( ["/nodes", "/edges"] ).then(function(responseArr){
         edges: edgesObj
     };
 
+    var chosenNode = function(values, id, selected, hovering) {
+        values.borderWidth = 20;
+        values.borderColor = '#1287A8';
+    }
+
     var options = {
-        interaction:{
-            multiselect: true,
-        },
-        configure: {                 // http://visjs.org/docs/network/configure.html
-            enabled: false,         // toggle the config interface
-            filter: true,
-           // container: undefined, // allows to put configure list in another html container
-            showButton: true,       // show generation options button at the bottom of the configurator
-                                    // allows to generate js objects for use in the script
-        },
-        nodes: {                    // http://visjs.org/docs/network/nodes.html
-            shape: 'box', 
-            shapeProperties:{
-                borderRadius: 3,
-            },
-            borderWidth: 0,
-            borderWidthSelected: 1,
-            font: {
-                face: 'Sofia Pro Soft',
-                color: '#FFFFFF',
-            },
-            color: {
-                background: '#010101',
-                highlight: {
-                    background: '#107896',
-                    border: '#1287A8'
-                }
-            },
-            margin: 10,             // text label margin
-            widthConstraint: 150,
+        layout: {
+            hierarchical:{ enabled: false, levelSeparation: 300, nodeSpacing: 2000, sortMethod: 'directed', },
+        }, // layout
+        interaction:{ multiselect: true, },
+
+        nodes: {
+            shape: 'circularImage',
+            size: 100,
+            shapeProperties:{ interpolation: false, },
+            chosen:{ label: false, node: chosenNode, },
+            borderWidth: 20,
+            borderWidthSelected: 15,
             labelHighlightBold: false,
-        },
+            font: {
+                size: 22,
+                face: 'Sofia Pro Soft',
+                color: '#010101',
+                strokeWidth: 12,
+                strokeColor: '#FFF',
+                vadjust: 14,
+            }, // font
+            color: {
+                border: '#010101',
+                background: '#FFFFFF',
+                highlight: { background: '#FFFFFF', border: '#1287A8' }
+            }, // color
+        }, // nodes
+
         edges:{
+            smooth:{
+                enabled: false,
+                roundness: 0.1,
+                type: 'diagonalCross',
+            },
+            arrows:{ to: { enabled:true, type: 'arrow' }, },
+            arrowStrikethrough: true,
             width: 12,
             selectionWidth: 0,
-            color: {
-                color: '#010101',
-                highlight: '#107896'
+            length: 1000,
+            color: { color: '#010101', highlight: '#107896' },
+        }, // edges
+
+        physics: {
+            solver: 'barnesHut',
+            barnesHut:{
+                avoidOverlap: 0.75,
+                springLength: 400,
+                centralGravity: 0,
             },
-            scaling:{
-            }
-        },
-        physics: {                  // http://visjs.org/docs/network/physics.html
-          barnesHut: {              // for the barnesHut solver (see 'solver' module)
-            avoidOverlap: 0.5,      // control the node overlap 0...1 
-          }  
-        },
-    };
+            hierarchicalRepulsion:{
+                nodeDistance: 500,
+                springLength: 200,
+                centralGravity: 0,
+            },
+        }, // physics
+    }; // options
 
     // ==================================================
     // 06 INITIALIZE THE GRAPH USING vis.Network()
@@ -241,13 +258,76 @@ getAll( ["/nodes", "/edges"] ).then(function(responseArr){
 
     network = new vis.Network(container, data, options);
 
-    // NETWORK SELECT EVENTS
-    network.on('selectNode', function(){ checkHudDisable(); });
-    network.on('deselectNode', function(){ checkHudDisable(); });
+    // ==================================================
+    // vis.Network() events
+    // ==================================================
+
+    network.on('selectNode', function(selection){ 
+        checkHudDisable(); 
+        if(selection.nodes.length < 2){
+            let selectedNode = nodesObj.get(selection.nodes[0]);
+            console.log(selectedNode.x);
+            nodesObj.add([
+                    {id: -1, label: 'Observation:\n\n' + selectedNode.problem + '\n\n', physics: true, shape: 'box', x: selectedNode.x-200, y: selectedNode.y+500, fixed: {x: true, y:true }, widthConstraint:{maximum: 400}, color:{background: '#1287A8', border: '#1287A8'}, font:{color:'#FFF', strokeWidth: 0, align: 'left'}, },
+                    {id: -2, label: 'Instruction:\n\n' + selectedNode.instruction + '\n\n', physics: true, shape: 'box', x: selectedNode.x+200, y: selectedNode.y+500, fixed: {x: true, y:true }, widthConstraint:{maximum: 400}, color:{background: '#1287A8', border: '#1287A8'}, font:{color:'#FFF', strokeWidth: 0, align: 'left'}, }
+                ]);
+            edgesObj.add([
+                    {id: -1, from: selection.nodes[0], to: -1, length: 500, color:{color: '#1287A8'}, arrows:{to:{enabled: false},}, dashes: [10,20],},
+                    {id: -2, from: selection.nodes[0], to: -2, length: 500, color:{color: '#1287A8'}, arrows:{to:{enabled: false},}, dashes: [10,20],},
+                ]);
+            console.log(selection.nodes);
+        }
+        else{
+            nodesObj.remove([-1,-2]);
+        }
+    });
+
+    network.on('selectEdge', function(){ checkHudDisable() });
+
+    network.on('dragEnd', function(selection){
+        // record new node position
+        if(selection.nodes){
+            let draggedNode = nodesObj.get(selection.nodes); // array
+            for(let i in draggedNode){
+                draggedNode[i].x = selection.pointer.canvas.x;
+                draggedNode[i].y = selection.pointer.canvas.y;
+            }
+            nodesObj.update(draggedNode);
+        }
+        checkHudDisable();
+    });
+
+    network.on('deselectEdge', function(){ checkHudDisable(); });
+    
+    network.on('deselectNode', function(){ 
+        checkHudDisable(); 
+        nodesObj.remove([-1, -2]);
+        edgesObj.remove([-1, -2]);
+    });
+
+    network.on('doubleClick', function(selection){
+        //if( selection.nodes.length > 0 ) { editNode(); }
+            let clickLocation = { 
+                clickX: selection.pointer.canvas.x,
+                clickY: selection.pointer.canvas.y,
+            }
+
+            console.log('x', clickLocation.clickX);
+            console.log('y', clickLocation.clickY);
+            addNode(clickLocation); 
+    });
+    
+    network.on('stabilized', function(){
+        let data = network.getPositions();
+        updateAll(['/positions'], data).then(function(response){
+            console.log(response);
+        });
+    });
 }); //getAll()
 
 function checkHudDisable() { // check if HUD buttons need to be disabled, depending on what is selected
     let selectedNodes = network.getSelectedNodes();
+    let selectedEdges = network.getSelectedEdges();
 
     switch(selectedNodes.length){
         /*case 0:
@@ -256,7 +336,8 @@ function checkHudDisable() { // check if HUD buttons need to be disabled, depend
         case 0:
             document.getElementById("editNode").className = " disabled"; // disable edit
             document.getElementById("deleteNodes").className = " disabled"; // disable delete
-            document.getElementById("connectNodes").className = " disabled"; // disable connect            
+            document.getElementById("connectNodes").className = " disabled"; // disable connect
+            if(selectedEdges.length > 0){ $('#deleteNodes').removeClass('disabled'); } // enable delete for edges             
             break;
         case 1:
             $('#editNode').removeClass('disabled'); //enable Edit
@@ -279,50 +360,9 @@ function checkHudDisable() { // check if HUD buttons need to be disabled, depend
 var exports = module.exports = {};
 exports.network = network;
 
-exports.addNode = function addNode() {
-                getAll(['/nodes']).then(function(response){
-                    let allNodes = response[0];
-                    let newNodeId, newEdgeId;      
-                    let selectedNodes = network.getSelectedNodes(); // array
-                    newNodeId = getIds(allNodes);
-                    // new node's data object
-                    let data = { 
-                        vId: newNodeId,
-                        title: 'New Pattern #' + newNodeId,
-                        problem: 'New Problem ' + newNodeId,
-                        instruction: 'New Instruction ' + newNodeId,
-                        label: '',
-                    };
-                    data.label = data.title + '\n\n' + data.problem + '\n' + data.instruction;
-
-                    // create the new node and the new edges in frontend
-                    nodesObj.add({ id: data.vId, title: data.title, problem: data.problem, instruction: data.instruction, label: data.label}); 
-                    let newSelection = [data.vId]; // add new node to selection
-                    // if a node is selected, automatically connect the new node
-                    if( selectedNodes.length > 0 ){ 
-                        getAll(['/edges']).then(function(response){
-                            let allEdges = response[0];
-                            newEdgeId = getIds(allEdges);
-                            //console.log('selected Nodes (from): ' + selectedNodes);
-                            data.from = selectedNodes, // edges from (array)
-                            data.to = newNodeId; // edges to
-                            data.edgevId = [];
-                            for (let i = 0; i < selectedNodes.length; i++){
-                                newSelection.push(data.from[i]);
-                                data.edgevId.push(newEdgeId+i);
-                                edgesObj.add({id: data.edgevId[i], from: data.from[i], to: data.to});
-                            }
-                            postAll(['/nodes', '/edges'], data).then(function(response){ // save nodes and edges to backend
-                                console.log(response);
-                            }); //postAll(nodes,edges)
-                        }); //getAll(edges)
-                    } // if
-                    else{ postAll(['/nodes'], data); } // or if nothing was selected, post only nodes
-                    network.setSelection({nodes: newSelection,});
-                    checkHudDisable();
-                    editNode();
-                }); // getAll(nodes)
-}
+exports.addNode = function(){
+    addNode();
+};
 
 exports.deleteSelectedNode = function deleteSelectedNode(){
                     let selectedNodes = network.getSelectedNodes(); // array containing ids
@@ -335,7 +375,9 @@ exports.deleteSelectedNode = function deleteSelectedNode(){
                             console.log(response);
                             for (let i=0; i < selectedNodes.length; i++){
                                 nodesObj.remove({id: selectedNodes[i]}); // remove each selected node in frontend
-                            }      
+                            }
+                            nodesObj.remove([-1,-2]);
+                            edgesObj.remove([-1,-2]);     
                         });                  
                     }
                     else if (selectedEdges){
@@ -376,6 +418,92 @@ editNode();
 
 }
 
+
+function addNode(params) {
+                getAll(['/nodes']).then( function(response) {
+                    let allNodes = response[0];
+                    let newNodeId, newEdgeId;
+                    let selectedNodes = network.getSelectedNodes(); // array
+                    newNodeId = getIds(allNodes);
+                    console.log('newNodeId', newNodeId);
+                    // new node's data object
+                    let data = { 
+                        vId: newNodeId,
+                        title: 'New Pattern #' + newNodeId,
+                        problem: 'New Problem ' + newNodeId,
+                        instruction: 'New Instruction ' + newNodeId,
+                        label: '',
+                        image: imgDir + '112_Entrance_transition.jpg',
+                    };
+                    data.label = data.title;
+                    if(params){ // if click location parameters are handed, use them for new node position
+                        data.x = params.clickX;
+                        data.y = params.clickY;
+                        if ( selectedNodes.length > 0 ){ 
+                            nodesObj.remove([-1,-2]); 
+                            data.y += 1000;
+                        }
+                    }
+                    else if(selectedNodes.length > 0){ // if a node is selected, add new node near selected node
+                        let selectedNode = nodesObj.get(selectedNodes[0]);
+                        data.x = selectedNode.x;
+                        data.y = selectedNode.y + 1000;
+                        nodesObj.remove([-1,-2]);
+                    }
+                    else{ // in the case of no nodes on canvas
+                        data.x = 0;
+                        data.y = 0;
+                    }
+                    // create the new node and the new edges in frontend
+                    nodesObj.add({ 
+                        id: data.vId, 
+                        title: data.title, 
+                        problem: data.problem, 
+                        instruction: data.instruction, 
+                        label: data.label,
+                        image: data.image,
+                        x: data.x,
+                        y: data.y,
+                    }); 
+
+                    let newSelection = [data.vId]; // add new node to selection
+                    // if a node is selected, automatically connect the new node
+                    if( selectedNodes.length > 0 ){ 
+                        getAll(['/edges']).then(function(response){
+                            let allEdges = response[0];
+                            newEdgeId = getIds(allEdges);
+                            console.log('New Edge Id', newEdgeId);
+                            //console.log('selected Nodes (from): ' + selectedNodes);
+                            data.from = selectedNodes, // edges from (array)
+                            data.to = newNodeId; // edges to
+                            data.edgevId = [];
+                            for (let i = 0; i < selectedNodes.length; i++){
+                                //newSelection.push(data.from[i]);
+                                data.edgevId.push(newEdgeId+i);
+                                edgesObj.add({id: data.edgevId[i], from: data.from[i], to: data.to});
+                            }
+                            postAll(['/nodes', '/edges'], data).then(function(response){ // save nodes and edges to backend
+                                console.log(response);
+                                network.unselectAll();
+                                network.setSelection({nodes: newSelection, edges: data.edgevId});
+                                checkHudDisable();
+                                editNode();
+                            }); //postAll(nodes,edges)
+                        }); //getAll(edges)
+                    } // if
+                    else{ 
+                        postAll(['/nodes'], data).then( function(response){
+                            network.unselectAll();
+                            network.setSelection({nodes: newSelection, edges: data.edgevId});
+                            checkHudDisable();
+                            console.log( response );
+                            editNode();
+                        }); 
+                    } // or if nothing was selected, post only nodes
+                }); // getAll(nodes)
+}
+
+
 function editNode(){
     let editWindow = document.getElementById('editWindow');
     editWindow.style.display = 'block';
@@ -386,19 +514,41 @@ function editNode(){
     document.getElementById('patternTitleInput').value = selectedNode[0].title;
     document.getElementById('patternProblemTxtArea').value = selectedNode[0].problem;
     document.getElementById('patternInstructionTxtArea').value = selectedNode[0].instruction;
+    document.getElementById('patternDiagram').src = selectedNode[0].image;
 
-    document.getElementById('saveEditButton').onclick = function(){
+    //document.getElementById('saveEditButton').addEventListener('submit', function(e){
+      $('#uploadForm').unbind('submit').bind('submit', function(event){
+        event.preventDefault();
+        let patternDiagram = document.getElementById('patternDiagram');
+
         selectedNode[0].title = document.getElementById('patternTitleInput').value;
         selectedNode[0].problem = document.getElementById('patternProblemTxtArea').value;
         selectedNode[0].instruction = document.getElementById('patternInstructionTxtArea').value;
-        selectedNode[0].label = selectedNode[0].title + '\n\n' + selectedNode[0].problem + '\n' + selectedNode[0].instruction;
-        nodesObj.update(selectedNode); // update node on frontend
-        console.log('Saved Node ' + selectedNodeId);
-        updateAll(['/nodes'], selectedNode[0]); // update node on DB
+        selectedNode[0].label = selectedNode[0].title;// + '\n\n' + selectedNode[0].problem + '\n' + selectedNode[0].instruction;
+
+        if( document.getElementById('uploadInput').value){
+            $(this).ajaxSubmit({
+                data: {vId: selectedNodeId[0]},
+                error: function(xhr){status('Error: ' + xhr.status);},
+                success: function(response){ 
+                    console.log( response );
+                        patternDiagram.setAttribute('src', '../uploads/' + response + '?' + new Date().getTime());
+                        selectedNode[0].image = patternDiagram.getAttribute('src');
+                        nodesObj.update(selectedNode); // update node on frontend
+                        console.log('Saved Node ' + selectedNodeId);
+                        updateAll(['/nodes'], selectedNode[0]); // update node on DB
+                }
+            });
+        }
+        else{
+            nodesObj.update(selectedNode); // update node on frontend
+            console.log('Saved Node ' + selectedNodeId);
+            updateAll(['/nodes'], selectedNode[0]); // update node on DB     
+        }
+
         editWindow.style.display = 'none';
-        document.getElementById('saveEditButton').removeAttribute("onclick");
-        document.getElementById('cancelEditButton').removeAttribute("onclick");
-    }
+        return false;
+    });
 
     document.getElementById('cancelEditButton').onclick = function(){
         editWindow.style.display = 'none';
