@@ -31,6 +31,6 @@ var db = new ODatabase({
 });*/
 
 //console.log(db);
-module.exports = { db };
+var exports = module.exports = db;
 
 

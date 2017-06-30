@@ -20,7 +20,6 @@ Ferdinand List - ferdinand.list at gmail dot com
 - [X] add a way to display pattern contents
 - [X] make edit node window dragable and improve UI
 - [X] use pattern diagrams as node icons
-- [ ] add hierarchy (not sure I'll do this eventually)
 - [ ] introduce project based pattern sequences
 	- [ ] highlight sequence nodes and edges
 	- [ ] create entry point functionality

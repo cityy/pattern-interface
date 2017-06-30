@@ -2,6 +2,33 @@ extends layout
 
 block content
   //- ==================================================
+  //- DEBUGGING INTERFACE 
+  //- ==================================================
+
+  div#debugInterface
+   div.container-fluid
+    h5 Debug Interface
+    div.row
+     div.col-xs-4
+      h5 VisJS
+      p Current Node ids:
+       span#d_CurrentNodeIdsVis
+      p Current Edges ids:
+       span#d_CurrentEdgeIdsVis
+     div.col-xs-4
+      h5 OrientDB
+      p Current Node ids:
+       span#d_CurrentNodeIdsOrient
+      p Current Edges ids:
+       span#d_CurrentEdgeIdsOrient
+      p Current User:
+       span#d_CurrentUser
+      p Current Project:
+       span#d_CurrentProject
+     div.col-xs-4
+      h5 Recent Actions
+
+  //- ==================================================
   //- HUD 
   //- ==================================================
 
@@ -58,6 +85,12 @@ block content
      a(href='#', class='disabled', id='connectNodes')
       i(class='fa fa-2x fa-exchange')
     //- HUD
+    //- swap edge direction
+    //-
+    div(class='row justify-content-center')
+     a(href='#', class='disabled', id='swapEdge')
+      i(class='fa fa-2x fa-reply')
+    //- HUD
     //- canvas Control line #1
     //-
     div(class='row justify-content-center', id='canvasControl')
@@ -87,6 +120,70 @@ block content
        i(class='fa fa-2x fa-angle-down') 
      div.col-4
 
+  div(id='patternWindow')
+   div(id='patternRelation')
+    h3 Relation:
+    p#patternRelationTitleA
+    img(id='patternRelationDiagramA') 
+    p#patternRelationTitleB
+    img(id='patternRelationDiagramB')
+    p#relationText Pattern Relation goes here
+    form(id='relationForm' name='relationForm' enctype="multipart/form-data" action="/edges" method="PUT")
+     textarea(name='Relation' type='text' id='patternRelationTxtArea' placeholder='Pattern Relation goes here')
+     button(type='submit' id='saveRelationButton')
+      | Save Pattern Relation
+     button(type='button' id='cancelRelationButton')
+      | Cancel
+
+   div(id='patternContent')
+    h3#patternTitle Pattern Title
+    p#patternClass Pattern Class
+    h5 Observation
+    p#patternObservation Observation Text
+    h5 Instruction
+    p#patternInstruction Instruction Text
+    h5 Diagram
+    img(id='patternContentDiagram')
+
+   div(id='patternClassEdit')
+    div.container-fluid
+     div(class='row justify-content-center')
+      h3 Manage Pattern Classes
+      //- 1) rename classes, delete classes
+          2) add classes
+      form(id='patternClassForm' name='patternClassForm' enctype="" action="" method="post")
+       button(type='submit' id='saveClassEditButton')
+        | Save Pattern Classes
+       button(type='button' id='cancelClassEditButton')
+        | Cancel      
+
+   div(id='patternEdit')
+    div.container-fluid
+     div(class='row justify-content-center')
+      h3 Edit Pattern      
+      form
+       p Pattern Title:
+       input(name='Pattern Title' type='text' id='patternTitleInput' placeholder='Pattern title goes here')
+      form(class="form-inline")
+       p Pattern Class:<br />
+       select(class="form-control form-control-sm" id="patternClassSelect" style="width:100%;")
+        option( hidden ) Placeholder
+        option Other class
+        option(id='managePatternClasses') Manage Classes..
+      form
+       p Pattern Observation:
+       textarea(name='Problem' type='text' id='patternProblemTxtArea' placeholder='Pattern Problem goes here')
+      form
+       p Pattern Instruction:
+       textarea(name='Instruction' type='text' id='patternInstructionTxtArea' placeholder='Pattern Instruction goes here')
+      form(id='uploadForm' name='diagramImage' enctype="multipart/form-data" action="/imgUpload" method="post")
+       p Pattern Diagram: 
+       img(src='' id='patternDiagram')
+       input(type="file" id='uploadInput' name='diagramImage')
+       button(type='submit' id='saveEditButton')
+        | Save Pattern
+       button(type='button' id='cancelEditButton')
+        | Cancel
 
 
   div(id='loginWindow')
@@ -153,28 +250,6 @@ block content
     button(type='button' id='logoutDismiss')
      | Dismiss
 
-
-  div(id='editWindow')
-   div.container-fluid
-    div(class='row justify-content-center')
-     form
-      p Pattern Title:
-      input(name='Pattern Title' type='text' id='patternTitleInput' placeholder='Pattern title goes here')
-     form
-      p Pattern Observation:
-      textarea(name='Problem' type='text' id='patternProblemTxtArea' placeholder='Pattern Problem goes here')
-     form
-      p Pattern Instruction:
-      textarea(name='Instruction' type='text' id='patternInstructionTxtArea' placeholder='Pattern Instruction goes here')
-     form(id='uploadForm' name='diagramImage' enctype="multipart/form-data" action="/imgUpload" method="post")
-      p Pattern Diagram: 
-      img(src='' id='patternDiagram')
-      input(type="file" id='uploadInput' name='diagramImage')
-      button(type='submit' id='saveEditButton')
-       | Save Pattern
-      button(type='button' id='cancelEditButton')
-       | Cancel
-
   div(id='projectWindow')
    div.container-fluid
     div(class='row justify-content-center')
@@ -185,6 +260,18 @@ block content
       button(type='button' id='saveNewProjectButton')
        | Save Project
       button(type='button' id='cancelProjectButton')
+       | Cancel
+
+
+  div(id='searchWindow')
+   div.container-fluid
+    div(class='row justify-content-center')
+     h3 Search Pattern
+     form(id='searchForm')
+      input(name='Search' type='text' id='searchInput' placeholder='Search...')
+      button(type='submit' id='submitSearch')
+       | Search
+      button(type='button' id='cancelSearch')
        | Cancel
 
   //- ==================================================

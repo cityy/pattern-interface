@@ -1555,23 +1555,29 @@ select.form-control:focus::-ms-value {
   border-width: 1px 0; }
   .form-control-static.form-control-sm, .input-group-sm > .form-control-static.form-control,
   .input-group-sm > .form-control-static.input-group-addon,
-  .input-group-sm > .input-group-btn > .form-control-static.btn, #loginWindow
+  .input-group-sm > .input-group-btn > .form-control-static.btn, #defaultWindow
+  .input-group-sm > .input-group-btn > button.form-control-static, #patternWindow
+  .input-group-sm > .input-group-btn > button.form-control-static, #loginWindow
   .input-group-sm > .input-group-btn > button.form-control-static, #projectWindow
-  .input-group-sm > .input-group-btn > button.form-control-static, #editWindow
+  .input-group-sm > .input-group-btn > button.form-control-static, #searchWindow
   .input-group-sm > .input-group-btn > button.form-control-static, .form-control-static.form-control-lg, .input-group-lg > .form-control-static.form-control,
   .input-group-lg > .form-control-static.input-group-addon,
-  .input-group-lg > .input-group-btn > .form-control-static.btn, #loginWindow
+  .input-group-lg > .input-group-btn > .form-control-static.btn, #defaultWindow
+  .input-group-lg > .input-group-btn > button.form-control-static, #patternWindow
+  .input-group-lg > .input-group-btn > button.form-control-static, #loginWindow
   .input-group-lg > .input-group-btn > button.form-control-static, #projectWindow
-  .input-group-lg > .input-group-btn > button.form-control-static, #editWindow
+  .input-group-lg > .input-group-btn > button.form-control-static, #searchWindow
   .input-group-lg > .input-group-btn > button.form-control-static {
     padding-right: 0;
     padding-left: 0; }
 
 .form-control-sm, .input-group-sm > .form-control,
 .input-group-sm > .input-group-addon,
-.input-group-sm > .input-group-btn > .btn, #loginWindow
+.input-group-sm > .input-group-btn > .btn, #defaultWindow
+.input-group-sm > .input-group-btn > button, #patternWindow
+.input-group-sm > .input-group-btn > button, #loginWindow
 .input-group-sm > .input-group-btn > button, #projectWindow
-.input-group-sm > .input-group-btn > button, #editWindow
+.input-group-sm > .input-group-btn > button, #searchWindow
 .input-group-sm > .input-group-btn > button {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
@@ -1584,9 +1590,11 @@ select.form-control-sm:not([size]):not([multiple]), .input-group-sm > select.for
 
 .form-control-lg, .input-group-lg > .form-control,
 .input-group-lg > .input-group-addon,
-.input-group-lg > .input-group-btn > .btn, #loginWindow
+.input-group-lg > .input-group-btn > .btn, #defaultWindow
+.input-group-lg > .input-group-btn > button, #patternWindow
+.input-group-lg > .input-group-btn > button, #loginWindow
 .input-group-lg > .input-group-btn > button, #projectWindow
-.input-group-lg > .input-group-btn > button, #editWindow
+.input-group-lg > .input-group-btn > button, #searchWindow
 .input-group-lg > .input-group-btn > button {
   padding: 0.75rem 1.5rem;
   font-size: 1.25rem;
@@ -1752,7 +1760,7 @@ select.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.for
     .form-inline .has-feedback .form-control-feedback {
       top: 0; } }
 
-.btn, #loginWindow button, #projectWindow button, #editWindow button {
+.btn, #defaultWindow button, #patternWindow button, #loginWindow button, #projectWindow button, #searchWindow button {
   display: inline-block;
   font-weight: normal;
   line-height: 1.25;
@@ -1765,38 +1773,40 @@ select.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.for
   font-size: 1rem;
   border-radius: 0.25rem;
   transition: all 0.2s ease-in-out; }
-  .btn:focus, #loginWindow button:focus, #projectWindow button:focus, #editWindow button:focus, .btn:hover, #loginWindow button:hover, #projectWindow button:hover, #editWindow button:hover {
+  .btn:focus, #defaultWindow button:focus, #patternWindow button:focus, #loginWindow button:focus, #projectWindow button:focus, #searchWindow button:focus, .btn:hover, #defaultWindow button:hover, #patternWindow button:hover, #loginWindow button:hover, #projectWindow button:hover, #searchWindow button:hover {
     text-decoration: none; }
-  .btn:focus, #loginWindow button:focus, #projectWindow button:focus, #editWindow button:focus, .btn.focus, #loginWindow button.focus, #projectWindow button.focus, #editWindow button.focus {
+  .btn:focus, #defaultWindow button:focus, #patternWindow button:focus, #loginWindow button:focus, #projectWindow button:focus, #searchWindow button:focus, .btn.focus, #defaultWindow button.focus, #patternWindow button.focus, #loginWindow button.focus, #projectWindow button.focus, #searchWindow button.focus {
     outline: 0;
     box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.25); }
-  .btn.disabled, #loginWindow button.disabled, #projectWindow button.disabled, #editWindow button.disabled, .btn:disabled, #loginWindow button:disabled, #projectWindow button:disabled, #editWindow button:disabled {
+  .btn.disabled, #defaultWindow button.disabled, #patternWindow button.disabled, #loginWindow button.disabled, #projectWindow button.disabled, #searchWindow button.disabled, .btn:disabled, #defaultWindow button:disabled, #patternWindow button:disabled, #loginWindow button:disabled, #projectWindow button:disabled, #searchWindow button:disabled {
     cursor: not-allowed;
     opacity: .65; }
-  .btn:active, #loginWindow button:active, #projectWindow button:active, #editWindow button:active, .btn.active, #loginWindow button.active, #projectWindow button.active, #editWindow button.active {
+  .btn:active, #defaultWindow button:active, #patternWindow button:active, #loginWindow button:active, #projectWindow button:active, #searchWindow button:active, .btn.active, #defaultWindow button.active, #patternWindow button.active, #loginWindow button.active, #projectWindow button.active, #searchWindow button.active {
     background-image: none; }
 
 a.btn.disabled,
 fieldset[disabled] a.btn {
   pointer-events: none; }
 
-.btn-primary, #loginWindow button, #projectWindow button, #editWindow button {
+.btn-primary, #defaultWindow button, #patternWindow button, #loginWindow button, #projectWindow button, #searchWindow button {
   color: #fff;
   background-color: #0275d8;
   border-color: #0275d8; }
-  .btn-primary:hover, #loginWindow button:hover, #projectWindow button:hover, #editWindow button:hover {
+  .btn-primary:hover, #defaultWindow button:hover, #patternWindow button:hover, #loginWindow button:hover, #projectWindow button:hover, #searchWindow button:hover {
     color: #fff;
     background-color: #025aa5;
     border-color: #01549b; }
-  .btn-primary:focus, #loginWindow button:focus, #projectWindow button:focus, #editWindow button:focus, .btn-primary.focus, #loginWindow button.focus, #projectWindow button.focus, #editWindow button.focus {
+  .btn-primary:focus, #defaultWindow button:focus, #patternWindow button:focus, #loginWindow button:focus, #projectWindow button:focus, #searchWindow button:focus, .btn-primary.focus, #defaultWindow button.focus, #patternWindow button.focus, #loginWindow button.focus, #projectWindow button.focus, #searchWindow button.focus {
     box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5); }
-  .btn-primary.disabled, #loginWindow button.disabled, #projectWindow button.disabled, #editWindow button.disabled, .btn-primary:disabled, #loginWindow button:disabled, #projectWindow button:disabled, #editWindow button:disabled {
+  .btn-primary.disabled, #defaultWindow button.disabled, #patternWindow button.disabled, #loginWindow button.disabled, #projectWindow button.disabled, #searchWindow button.disabled, .btn-primary:disabled, #defaultWindow button:disabled, #patternWindow button:disabled, #loginWindow button:disabled, #projectWindow button:disabled, #searchWindow button:disabled {
     background-color: #0275d8;
     border-color: #0275d8; }
-  .btn-primary:active, #loginWindow button:active, #projectWindow button:active, #editWindow button:active, .btn-primary.active, #loginWindow button.active, #projectWindow button.active, #editWindow button.active,
-  .show > .btn-primary.dropdown-toggle, #loginWindow
+  .btn-primary:active, #defaultWindow button:active, #patternWindow button:active, #loginWindow button:active, #projectWindow button:active, #searchWindow button:active, .btn-primary.active, #defaultWindow button.active, #patternWindow button.active, #loginWindow button.active, #projectWindow button.active, #searchWindow button.active,
+  .show > .btn-primary.dropdown-toggle, #defaultWindow
+  .show > button.dropdown-toggle, #patternWindow
+  .show > button.dropdown-toggle, #loginWindow
   .show > button.dropdown-toggle, #projectWindow
-  .show > button.dropdown-toggle, #editWindow
+  .show > button.dropdown-toggle, #searchWindow
   .show > button.dropdown-toggle {
     color: #fff;
     background-color: #025aa5;
@@ -2042,12 +2052,12 @@ fieldset[disabled] a.btn {
     .btn-link:disabled:focus, .btn-link:disabled:hover {
       text-decoration: none; }
 
-.btn-lg, .btn-group-lg > .btn, #loginWindow .btn-group-lg > button, #projectWindow .btn-group-lg > button, #editWindow .btn-group-lg > button {
+.btn-lg, .btn-group-lg > .btn, #defaultWindow .btn-group-lg > button, #patternWindow .btn-group-lg > button, #loginWindow .btn-group-lg > button, #projectWindow .btn-group-lg > button, #searchWindow .btn-group-lg > button {
   padding: 0.75rem 1.5rem;
   font-size: 1.25rem;
   border-radius: 0.3rem; }
 
-.btn-sm, .btn-group-sm > .btn, #loginWindow .btn-group-sm > button, #projectWindow .btn-group-sm > button, #editWindow .btn-group-sm > button {
+.btn-sm, .btn-group-sm > .btn, #defaultWindow .btn-group-sm > button, #patternWindow .btn-group-sm > button, #loginWindow .btn-group-sm > button, #projectWindow .btn-group-sm > button, #searchWindow .btn-group-sm > button {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
   border-radius: 0.2rem; }
@@ -2198,56 +2208,86 @@ tbody.collapse.show {
   position: relative;
   display: inline-flex;
   vertical-align: middle; }
-  .btn-group > .btn, #loginWindow .btn-group > button, #projectWindow .btn-group > button, #editWindow .btn-group > button,
-  .btn-group-vertical > .btn, #loginWindow
+  .btn-group > .btn, #defaultWindow .btn-group > button, #patternWindow .btn-group > button, #loginWindow .btn-group > button, #projectWindow .btn-group > button, #searchWindow .btn-group > button,
+  .btn-group-vertical > .btn, #defaultWindow
+  .btn-group-vertical > button, #patternWindow
+  .btn-group-vertical > button, #loginWindow
   .btn-group-vertical > button, #projectWindow
-  .btn-group-vertical > button, #editWindow
+  .btn-group-vertical > button, #searchWindow
   .btn-group-vertical > button {
     position: relative;
     flex: 0 1 auto; }
-    .btn-group > .btn:hover, #loginWindow .btn-group > button:hover, #projectWindow .btn-group > button:hover, #editWindow .btn-group > button:hover,
-    .btn-group-vertical > .btn:hover, #loginWindow
+    .btn-group > .btn:hover, #defaultWindow .btn-group > button:hover, #patternWindow .btn-group > button:hover, #loginWindow .btn-group > button:hover, #projectWindow .btn-group > button:hover, #searchWindow .btn-group > button:hover,
+    .btn-group-vertical > .btn:hover, #defaultWindow
+    .btn-group-vertical > button:hover, #patternWindow
+    .btn-group-vertical > button:hover, #loginWindow
     .btn-group-vertical > button:hover, #projectWindow
-    .btn-group-vertical > button:hover, #editWindow
+    .btn-group-vertical > button:hover, #searchWindow
     .btn-group-vertical > button:hover {
       z-index: 2; }
-    .btn-group > .btn:focus, #loginWindow .btn-group > button:focus, #projectWindow .btn-group > button:focus, #editWindow .btn-group > button:focus, .btn-group > .btn:active, #loginWindow .btn-group > button:active, #projectWindow .btn-group > button:active, #editWindow .btn-group > button:active, .btn-group > .btn.active, #loginWindow .btn-group > button.active, #projectWindow .btn-group > button.active, #editWindow .btn-group > button.active,
-    .btn-group-vertical > .btn:focus, #loginWindow
+    .btn-group > .btn:focus, #defaultWindow .btn-group > button:focus, #patternWindow .btn-group > button:focus, #loginWindow .btn-group > button:focus, #projectWindow .btn-group > button:focus, #searchWindow .btn-group > button:focus, .btn-group > .btn:active, #defaultWindow .btn-group > button:active, #patternWindow .btn-group > button:active, #loginWindow .btn-group > button:active, #projectWindow .btn-group > button:active, #searchWindow .btn-group > button:active, .btn-group > .btn.active, #defaultWindow .btn-group > button.active, #patternWindow .btn-group > button.active, #loginWindow .btn-group > button.active, #projectWindow .btn-group > button.active, #searchWindow .btn-group > button.active,
+    .btn-group-vertical > .btn:focus, #defaultWindow
+    .btn-group-vertical > button:focus, #patternWindow
+    .btn-group-vertical > button:focus, #loginWindow
     .btn-group-vertical > button:focus, #projectWindow
-    .btn-group-vertical > button:focus, #editWindow
+    .btn-group-vertical > button:focus, #searchWindow
     .btn-group-vertical > button:focus,
-    .btn-group-vertical > .btn:active, #loginWindow
+    .btn-group-vertical > .btn:active, #defaultWindow
+    .btn-group-vertical > button:active, #patternWindow
+    .btn-group-vertical > button:active, #loginWindow
     .btn-group-vertical > button:active, #projectWindow
-    .btn-group-vertical > button:active, #editWindow
+    .btn-group-vertical > button:active, #searchWindow
     .btn-group-vertical > button:active,
-    .btn-group-vertical > .btn.active, #loginWindow
+    .btn-group-vertical > .btn.active, #defaultWindow
+    .btn-group-vertical > button.active, #patternWindow
+    .btn-group-vertical > button.active, #loginWindow
     .btn-group-vertical > button.active, #projectWindow
-    .btn-group-vertical > button.active, #editWindow
+    .btn-group-vertical > button.active, #searchWindow
     .btn-group-vertical > button.active {
       z-index: 2; }
-  .btn-group .btn + .btn, .btn-group #loginWindow button + .btn, #loginWindow .btn-group button + .btn, .btn-group #projectWindow button + .btn, #projectWindow .btn-group button + .btn, .btn-group #editWindow button + .btn, #editWindow .btn-group button + .btn, .btn-group #loginWindow .btn + button, #loginWindow .btn-group .btn + button, .btn-group #loginWindow button + button, #loginWindow .btn-group button + button, .btn-group #projectWindow .btn + button, #projectWindow .btn-group .btn + button, .btn-group #projectWindow button + button, #projectWindow .btn-group button + button, .btn-group #editWindow .btn + button, #editWindow .btn-group .btn + button, .btn-group #editWindow button + button, #editWindow .btn-group button + button,
+  .btn-group .btn + .btn, .btn-group #defaultWindow button + .btn, #defaultWindow .btn-group button + .btn, .btn-group #patternWindow button + .btn, #patternWindow .btn-group button + .btn, .btn-group #loginWindow button + .btn, #loginWindow .btn-group button + .btn, .btn-group #projectWindow button + .btn, #projectWindow .btn-group button + .btn, .btn-group #searchWindow button + .btn, #searchWindow .btn-group button + .btn, .btn-group #defaultWindow .btn + button, #defaultWindow .btn-group .btn + button, .btn-group #defaultWindow button + button, #defaultWindow .btn-group button + button, .btn-group #patternWindow .btn + button, #patternWindow .btn-group .btn + button, .btn-group #patternWindow button + button, #patternWindow .btn-group button + button, .btn-group #loginWindow .btn + button, #loginWindow .btn-group .btn + button, .btn-group #loginWindow button + button, #loginWindow .btn-group button + button, .btn-group #projectWindow .btn + button, #projectWindow .btn-group .btn + button, .btn-group #projectWindow button + button, #projectWindow .btn-group button + button, .btn-group #searchWindow .btn + button, #searchWindow .btn-group .btn + button, .btn-group #searchWindow button + button, #searchWindow .btn-group button + button,
   .btn-group .btn + .btn-group,
+  .btn-group #defaultWindow button + .btn-group, #defaultWindow
+  .btn-group button + .btn-group,
+  .btn-group #patternWindow button + .btn-group, #patternWindow
+  .btn-group button + .btn-group,
   .btn-group #loginWindow button + .btn-group, #loginWindow
   .btn-group button + .btn-group,
   .btn-group #projectWindow button + .btn-group, #projectWindow
   .btn-group button + .btn-group,
-  .btn-group #editWindow button + .btn-group, #editWindow
+  .btn-group #searchWindow button + .btn-group, #searchWindow
   .btn-group button + .btn-group,
   .btn-group .btn-group + .btn,
+  .btn-group #defaultWindow .btn-group + button, #defaultWindow
+  .btn-group .btn-group + button,
+  .btn-group #patternWindow .btn-group + button, #patternWindow
+  .btn-group .btn-group + button,
   .btn-group #loginWindow .btn-group + button, #loginWindow
   .btn-group .btn-group + button,
   .btn-group #projectWindow .btn-group + button, #projectWindow
   .btn-group .btn-group + button,
-  .btn-group #editWindow .btn-group + button, #editWindow
+  .btn-group #searchWindow .btn-group + button, #searchWindow
   .btn-group .btn-group + button,
   .btn-group .btn-group + .btn-group,
   .btn-group-vertical .btn + .btn,
+  .btn-group-vertical #defaultWindow button + .btn, #defaultWindow
+  .btn-group-vertical button + .btn,
+  .btn-group-vertical #patternWindow button + .btn, #patternWindow
+  .btn-group-vertical button + .btn,
   .btn-group-vertical #loginWindow button + .btn, #loginWindow
   .btn-group-vertical button + .btn,
   .btn-group-vertical #projectWindow button + .btn, #projectWindow
   .btn-group-vertical button + .btn,
-  .btn-group-vertical #editWindow button + .btn, #editWindow
+  .btn-group-vertical #searchWindow button + .btn, #searchWindow
   .btn-group-vertical button + .btn,
+  .btn-group-vertical #defaultWindow .btn + button, #defaultWindow
+  .btn-group-vertical .btn + button,
+  .btn-group-vertical #defaultWindow button + button, #defaultWindow
+  .btn-group-vertical button + button,
+  .btn-group-vertical #patternWindow .btn + button, #patternWindow
+  .btn-group-vertical .btn + button,
+  .btn-group-vertical #patternWindow button + button, #patternWindow
+  .btn-group-vertical button + button,
   .btn-group-vertical #loginWindow .btn + button, #loginWindow
   .btn-group-vertical .btn + button,
   .btn-group-vertical #loginWindow button + button, #loginWindow
@@ -2256,23 +2296,31 @@ tbody.collapse.show {
   .btn-group-vertical .btn + button,
   .btn-group-vertical #projectWindow button + button, #projectWindow
   .btn-group-vertical button + button,
-  .btn-group-vertical #editWindow .btn + button, #editWindow
+  .btn-group-vertical #searchWindow .btn + button, #searchWindow
   .btn-group-vertical .btn + button,
-  .btn-group-vertical #editWindow button + button, #editWindow
+  .btn-group-vertical #searchWindow button + button, #searchWindow
   .btn-group-vertical button + button,
   .btn-group-vertical .btn + .btn-group,
+  .btn-group-vertical #defaultWindow button + .btn-group, #defaultWindow
+  .btn-group-vertical button + .btn-group,
+  .btn-group-vertical #patternWindow button + .btn-group, #patternWindow
+  .btn-group-vertical button + .btn-group,
   .btn-group-vertical #loginWindow button + .btn-group, #loginWindow
   .btn-group-vertical button + .btn-group,
   .btn-group-vertical #projectWindow button + .btn-group, #projectWindow
   .btn-group-vertical button + .btn-group,
-  .btn-group-vertical #editWindow button + .btn-group, #editWindow
+  .btn-group-vertical #searchWindow button + .btn-group, #searchWindow
   .btn-group-vertical button + .btn-group,
   .btn-group-vertical .btn-group + .btn,
+  .btn-group-vertical #defaultWindow .btn-group + button, #defaultWindow
+  .btn-group-vertical .btn-group + button,
+  .btn-group-vertical #patternWindow .btn-group + button, #patternWindow
+  .btn-group-vertical .btn-group + button,
   .btn-group-vertical #loginWindow .btn-group + button, #loginWindow
   .btn-group-vertical .btn-group + button,
   .btn-group-vertical #projectWindow .btn-group + button, #projectWindow
   .btn-group-vertical .btn-group + button,
-  .btn-group-vertical #editWindow .btn-group + button, #editWindow
+  .btn-group-vertical #searchWindow .btn-group + button, #searchWindow
   .btn-group-vertical .btn-group + button,
   .btn-group-vertical .btn-group + .btn-group {
     margin-left: -1px; }
@@ -2283,16 +2331,16 @@ tbody.collapse.show {
   .btn-toolbar .input-group {
     width: auto; }
 
-.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle), #loginWindow .btn-group > button:not(:first-child):not(:last-child):not(.dropdown-toggle), #projectWindow .btn-group > button:not(:first-child):not(:last-child):not(.dropdown-toggle), #editWindow .btn-group > button:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle), #defaultWindow .btn-group > button:not(:first-child):not(:last-child):not(.dropdown-toggle), #patternWindow .btn-group > button:not(:first-child):not(:last-child):not(.dropdown-toggle), #loginWindow .btn-group > button:not(:first-child):not(:last-child):not(.dropdown-toggle), #projectWindow .btn-group > button:not(:first-child):not(:last-child):not(.dropdown-toggle), #searchWindow .btn-group > button:not(:first-child):not(:last-child):not(.dropdown-toggle) {
   border-radius: 0; }
 
-.btn-group > .btn:first-child, #loginWindow .btn-group > button:first-child, #projectWindow .btn-group > button:first-child, #editWindow .btn-group > button:first-child {
+.btn-group > .btn:first-child, #defaultWindow .btn-group > button:first-child, #patternWindow .btn-group > button:first-child, #loginWindow .btn-group > button:first-child, #projectWindow .btn-group > button:first-child, #searchWindow .btn-group > button:first-child {
   margin-left: 0; }
-  .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle), #loginWindow .btn-group > button:first-child:not(:last-child):not(.dropdown-toggle), #projectWindow .btn-group > button:first-child:not(:last-child):not(.dropdown-toggle), #editWindow .btn-group > button:first-child:not(:last-child):not(.dropdown-toggle) {
+  .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle), #defaultWindow .btn-group > button:first-child:not(:last-child):not(.dropdown-toggle), #patternWindow .btn-group > button:first-child:not(:last-child):not(.dropdown-toggle), #loginWindow .btn-group > button:first-child:not(:last-child):not(.dropdown-toggle), #projectWindow .btn-group > button:first-child:not(:last-child):not(.dropdown-toggle), #searchWindow .btn-group > button:first-child:not(:last-child):not(.dropdown-toggle) {
     border-bottom-right-radius: 0;
     border-top-right-radius: 0; }
 
-.btn-group > .btn:last-child:not(:first-child), #loginWindow .btn-group > button:last-child:not(:first-child), #projectWindow .btn-group > button:last-child:not(:first-child), #editWindow .btn-group > button:last-child:not(:first-child),
+.btn-group > .btn:last-child:not(:first-child), #defaultWindow .btn-group > button:last-child:not(:first-child), #patternWindow .btn-group > button:last-child:not(:first-child), #loginWindow .btn-group > button:last-child:not(:first-child), #projectWindow .btn-group > button:last-child:not(:first-child), #searchWindow .btn-group > button:last-child:not(:first-child),
 .btn-group > .dropdown-toggle:not(:first-child) {
   border-bottom-left-radius: 0;
   border-top-left-radius: 0; }
@@ -2300,15 +2348,15 @@ tbody.collapse.show {
 .btn-group > .btn-group {
   float: left; }
 
-.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn, #loginWindow .btn-group > .btn-group:not(:first-child):not(:last-child) > button, #projectWindow .btn-group > .btn-group:not(:first-child):not(:last-child) > button, #editWindow .btn-group > .btn-group:not(:first-child):not(:last-child) > button {
+.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn, #defaultWindow .btn-group > .btn-group:not(:first-child):not(:last-child) > button, #patternWindow .btn-group > .btn-group:not(:first-child):not(:last-child) > button, #loginWindow .btn-group > .btn-group:not(:first-child):not(:last-child) > button, #projectWindow .btn-group > .btn-group:not(:first-child):not(:last-child) > button, #searchWindow .btn-group > .btn-group:not(:first-child):not(:last-child) > button {
   border-radius: 0; }
 
-.btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child, #loginWindow .btn-group > .btn-group:first-child:not(:last-child) > button:last-child, #projectWindow .btn-group > .btn-group:first-child:not(:last-child) > button:last-child, #editWindow .btn-group > .btn-group:first-child:not(:last-child) > button:last-child,
+.btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child, #defaultWindow .btn-group > .btn-group:first-child:not(:last-child) > button:last-child, #patternWindow .btn-group > .btn-group:first-child:not(:last-child) > button:last-child, #loginWindow .btn-group > .btn-group:first-child:not(:last-child) > button:last-child, #projectWindow .btn-group > .btn-group:first-child:not(:last-child) > button:last-child, #searchWindow .btn-group > .btn-group:first-child:not(:last-child) > button:last-child,
 .btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
   border-bottom-right-radius: 0;
   border-top-right-radius: 0; }
 
-.btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child, #loginWindow .btn-group > .btn-group:last-child:not(:first-child) > button:first-child, #projectWindow .btn-group > .btn-group:last-child:not(:first-child) > button:first-child, #editWindow .btn-group > .btn-group:last-child:not(:first-child) > button:first-child {
+.btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child, #defaultWindow .btn-group > .btn-group:last-child:not(:first-child) > button:first-child, #patternWindow .btn-group > .btn-group:last-child:not(:first-child) > button:first-child, #loginWindow .btn-group > .btn-group:last-child:not(:first-child) > button:first-child, #projectWindow .btn-group > .btn-group:last-child:not(:first-child) > button:first-child, #searchWindow .btn-group > .btn-group:last-child:not(:first-child) > button:first-child {
   border-bottom-left-radius: 0;
   border-top-left-radius: 0; }
 
@@ -2316,17 +2364,17 @@ tbody.collapse.show {
 .btn-group.open .dropdown-toggle {
   outline: 0; }
 
-.btn + .dropdown-toggle-split, #loginWindow button + .dropdown-toggle-split, #projectWindow button + .dropdown-toggle-split, #editWindow button + .dropdown-toggle-split {
+.btn + .dropdown-toggle-split, #defaultWindow button + .dropdown-toggle-split, #patternWindow button + .dropdown-toggle-split, #loginWindow button + .dropdown-toggle-split, #projectWindow button + .dropdown-toggle-split, #searchWindow button + .dropdown-toggle-split {
   padding-right: 0.75rem;
   padding-left: 0.75rem; }
-  .btn + .dropdown-toggle-split::after, #loginWindow button + .dropdown-toggle-split::after, #projectWindow button + .dropdown-toggle-split::after, #editWindow button + .dropdown-toggle-split::after {
+  .btn + .dropdown-toggle-split::after, #defaultWindow button + .dropdown-toggle-split::after, #patternWindow button + .dropdown-toggle-split::after, #loginWindow button + .dropdown-toggle-split::after, #projectWindow button + .dropdown-toggle-split::after, #searchWindow button + .dropdown-toggle-split::after {
     margin-left: 0; }
 
-.btn-sm + .dropdown-toggle-split, .btn-group-sm > .btn + .dropdown-toggle-split, #loginWindow .btn-group-sm > button + .dropdown-toggle-split, #projectWindow .btn-group-sm > button + .dropdown-toggle-split, #editWindow .btn-group-sm > button + .dropdown-toggle-split {
+.btn-sm + .dropdown-toggle-split, .btn-group-sm > .btn + .dropdown-toggle-split, #defaultWindow .btn-group-sm > button + .dropdown-toggle-split, #patternWindow .btn-group-sm > button + .dropdown-toggle-split, #loginWindow .btn-group-sm > button + .dropdown-toggle-split, #projectWindow .btn-group-sm > button + .dropdown-toggle-split, #searchWindow .btn-group-sm > button + .dropdown-toggle-split {
   padding-right: 0.375rem;
   padding-left: 0.375rem; }
 
-.btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split, #loginWindow .btn-group-lg > button + .dropdown-toggle-split, #projectWindow .btn-group-lg > button + .dropdown-toggle-split, #editWindow .btn-group-lg > button + .dropdown-toggle-split {
+.btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split, #defaultWindow .btn-group-lg > button + .dropdown-toggle-split, #patternWindow .btn-group-lg > button + .dropdown-toggle-split, #loginWindow .btn-group-lg > button + .dropdown-toggle-split, #projectWindow .btn-group-lg > button + .dropdown-toggle-split, #searchWindow .btn-group-lg > button + .dropdown-toggle-split {
   padding-right: 1.125rem;
   padding-left: 1.125rem; }
 
@@ -2335,57 +2383,67 @@ tbody.collapse.show {
   flex-direction: column;
   align-items: flex-start;
   justify-content: center; }
-  .btn-group-vertical .btn, .btn-group-vertical #loginWindow button, #loginWindow .btn-group-vertical button, .btn-group-vertical #projectWindow button, #projectWindow .btn-group-vertical button, .btn-group-vertical #editWindow button, #editWindow .btn-group-vertical button,
+  .btn-group-vertical .btn, .btn-group-vertical #defaultWindow button, #defaultWindow .btn-group-vertical button, .btn-group-vertical #patternWindow button, #patternWindow .btn-group-vertical button, .btn-group-vertical #loginWindow button, #loginWindow .btn-group-vertical button, .btn-group-vertical #projectWindow button, #projectWindow .btn-group-vertical button, .btn-group-vertical #searchWindow button, #searchWindow .btn-group-vertical button,
   .btn-group-vertical .btn-group {
     width: 100%; }
-  .btn-group-vertical > .btn + .btn, #loginWindow .btn-group-vertical > button + .btn, #projectWindow .btn-group-vertical > button + .btn, #editWindow .btn-group-vertical > button + .btn, #loginWindow .btn-group-vertical > .btn + button, #loginWindow .btn-group-vertical > button + button, #projectWindow .btn-group-vertical > .btn + button, #projectWindow .btn-group-vertical > button + button, #editWindow .btn-group-vertical > .btn + button, #editWindow .btn-group-vertical > button + button,
-  .btn-group-vertical > .btn + .btn-group, #loginWindow
+  .btn-group-vertical > .btn + .btn, #defaultWindow .btn-group-vertical > button + .btn, #patternWindow .btn-group-vertical > button + .btn, #loginWindow .btn-group-vertical > button + .btn, #projectWindow .btn-group-vertical > button + .btn, #searchWindow .btn-group-vertical > button + .btn, #defaultWindow .btn-group-vertical > .btn + button, #defaultWindow .btn-group-vertical > button + button, #patternWindow .btn-group-vertical > .btn + button, #patternWindow .btn-group-vertical > button + button, #loginWindow .btn-group-vertical > .btn + button, #loginWindow .btn-group-vertical > button + button, #projectWindow .btn-group-vertical > .btn + button, #projectWindow .btn-group-vertical > button + button, #searchWindow .btn-group-vertical > .btn + button, #searchWindow .btn-group-vertical > button + button,
+  .btn-group-vertical > .btn + .btn-group, #defaultWindow
+  .btn-group-vertical > button + .btn-group, #patternWindow
+  .btn-group-vertical > button + .btn-group, #loginWindow
   .btn-group-vertical > button + .btn-group, #projectWindow
-  .btn-group-vertical > button + .btn-group, #editWindow
+  .btn-group-vertical > button + .btn-group, #searchWindow
   .btn-group-vertical > button + .btn-group,
-  .btn-group-vertical > .btn-group + .btn, #loginWindow
+  .btn-group-vertical > .btn-group + .btn, #defaultWindow
+  .btn-group-vertical > .btn-group + button, #patternWindow
+  .btn-group-vertical > .btn-group + button, #loginWindow
   .btn-group-vertical > .btn-group + button, #projectWindow
-  .btn-group-vertical > .btn-group + button, #editWindow
+  .btn-group-vertical > .btn-group + button, #searchWindow
   .btn-group-vertical > .btn-group + button,
   .btn-group-vertical > .btn-group + .btn-group {
     margin-top: -1px;
     margin-left: 0; }
 
-.btn-group-vertical > .btn:not(:first-child):not(:last-child), #loginWindow .btn-group-vertical > button:not(:first-child):not(:last-child), #projectWindow .btn-group-vertical > button:not(:first-child):not(:last-child), #editWindow .btn-group-vertical > button:not(:first-child):not(:last-child) {
+.btn-group-vertical > .btn:not(:first-child):not(:last-child), #defaultWindow .btn-group-vertical > button:not(:first-child):not(:last-child), #patternWindow .btn-group-vertical > button:not(:first-child):not(:last-child), #loginWindow .btn-group-vertical > button:not(:first-child):not(:last-child), #projectWindow .btn-group-vertical > button:not(:first-child):not(:last-child), #searchWindow .btn-group-vertical > button:not(:first-child):not(:last-child) {
   border-radius: 0; }
 
-.btn-group-vertical > .btn:first-child:not(:last-child), #loginWindow .btn-group-vertical > button:first-child:not(:last-child), #projectWindow .btn-group-vertical > button:first-child:not(:last-child), #editWindow .btn-group-vertical > button:first-child:not(:last-child) {
+.btn-group-vertical > .btn:first-child:not(:last-child), #defaultWindow .btn-group-vertical > button:first-child:not(:last-child), #patternWindow .btn-group-vertical > button:first-child:not(:last-child), #loginWindow .btn-group-vertical > button:first-child:not(:last-child), #projectWindow .btn-group-vertical > button:first-child:not(:last-child), #searchWindow .btn-group-vertical > button:first-child:not(:last-child) {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0; }
 
-.btn-group-vertical > .btn:last-child:not(:first-child), #loginWindow .btn-group-vertical > button:last-child:not(:first-child), #projectWindow .btn-group-vertical > button:last-child:not(:first-child), #editWindow .btn-group-vertical > button:last-child:not(:first-child) {
+.btn-group-vertical > .btn:last-child:not(:first-child), #defaultWindow .btn-group-vertical > button:last-child:not(:first-child), #patternWindow .btn-group-vertical > button:last-child:not(:first-child), #loginWindow .btn-group-vertical > button:last-child:not(:first-child), #projectWindow .btn-group-vertical > button:last-child:not(:first-child), #searchWindow .btn-group-vertical > button:last-child:not(:first-child) {
   border-top-right-radius: 0;
   border-top-left-radius: 0; }
 
-.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn, #loginWindow .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > button, #projectWindow .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > button, #editWindow .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > button {
+.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn, #defaultWindow .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > button, #patternWindow .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > button, #loginWindow .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > button, #projectWindow .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > button, #searchWindow .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > button {
   border-radius: 0; }
 
-.btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child, #loginWindow .btn-group-vertical > .btn-group:first-child:not(:last-child) > button:last-child, #projectWindow .btn-group-vertical > .btn-group:first-child:not(:last-child) > button:last-child, #editWindow .btn-group-vertical > .btn-group:first-child:not(:last-child) > button:last-child,
+.btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child, #defaultWindow .btn-group-vertical > .btn-group:first-child:not(:last-child) > button:last-child, #patternWindow .btn-group-vertical > .btn-group:first-child:not(:last-child) > button:last-child, #loginWindow .btn-group-vertical > .btn-group:first-child:not(:last-child) > button:last-child, #projectWindow .btn-group-vertical > .btn-group:first-child:not(:last-child) > button:last-child, #searchWindow .btn-group-vertical > .btn-group:first-child:not(:last-child) > button:last-child,
 .btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0; }
 
-.btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child, #loginWindow .btn-group-vertical > .btn-group:last-child:not(:first-child) > button:first-child, #projectWindow .btn-group-vertical > .btn-group:last-child:not(:first-child) > button:first-child, #editWindow .btn-group-vertical > .btn-group:last-child:not(:first-child) > button:first-child {
+.btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child, #defaultWindow .btn-group-vertical > .btn-group:last-child:not(:first-child) > button:first-child, #patternWindow .btn-group-vertical > .btn-group:last-child:not(:first-child) > button:first-child, #loginWindow .btn-group-vertical > .btn-group:last-child:not(:first-child) > button:first-child, #projectWindow .btn-group-vertical > .btn-group:last-child:not(:first-child) > button:first-child, #searchWindow .btn-group-vertical > .btn-group:last-child:not(:first-child) > button:first-child {
   border-top-right-radius: 0;
   border-top-left-radius: 0; }
 
-[data-toggle="buttons"] > .btn input[type="radio"], #loginWindow [data-toggle="buttons"] > button input[type="radio"], #projectWindow [data-toggle="buttons"] > button input[type="radio"], #editWindow [data-toggle="buttons"] > button input[type="radio"],
-[data-toggle="buttons"] > .btn input[type="checkbox"], #loginWindow
+[data-toggle="buttons"] > .btn input[type="radio"], #defaultWindow [data-toggle="buttons"] > button input[type="radio"], #patternWindow [data-toggle="buttons"] > button input[type="radio"], #loginWindow [data-toggle="buttons"] > button input[type="radio"], #projectWindow [data-toggle="buttons"] > button input[type="radio"], #searchWindow [data-toggle="buttons"] > button input[type="radio"],
+[data-toggle="buttons"] > .btn input[type="checkbox"], #defaultWindow
+[data-toggle="buttons"] > button input[type="checkbox"], #patternWindow
+[data-toggle="buttons"] > button input[type="checkbox"], #loginWindow
 [data-toggle="buttons"] > button input[type="checkbox"], #projectWindow
-[data-toggle="buttons"] > button input[type="checkbox"], #editWindow
+[data-toggle="buttons"] > button input[type="checkbox"], #searchWindow
 [data-toggle="buttons"] > button input[type="checkbox"],
-[data-toggle="buttons"] > .btn-group > .btn input[type="radio"], #loginWindow
+[data-toggle="buttons"] > .btn-group > .btn input[type="radio"], #defaultWindow
+[data-toggle="buttons"] > .btn-group > button input[type="radio"], #patternWindow
+[data-toggle="buttons"] > .btn-group > button input[type="radio"], #loginWindow
 [data-toggle="buttons"] > .btn-group > button input[type="radio"], #projectWindow
-[data-toggle="buttons"] > .btn-group > button input[type="radio"], #editWindow
+[data-toggle="buttons"] > .btn-group > button input[type="radio"], #searchWindow
 [data-toggle="buttons"] > .btn-group > button input[type="radio"],
-[data-toggle="buttons"] > .btn-group > .btn input[type="checkbox"], #loginWindow
+[data-toggle="buttons"] > .btn-group > .btn input[type="checkbox"], #defaultWindow
+[data-toggle="buttons"] > .btn-group > button input[type="checkbox"], #patternWindow
+[data-toggle="buttons"] > .btn-group > button input[type="checkbox"], #loginWindow
 [data-toggle="buttons"] > .btn-group > button input[type="checkbox"], #projectWindow
-[data-toggle="buttons"] > .btn-group > button input[type="checkbox"], #editWindow
+[data-toggle="buttons"] > .btn-group > button input[type="checkbox"], #searchWindow
 [data-toggle="buttons"] > .btn-group > button input[type="checkbox"] {
   position: absolute;
   clip: rect(0, 0, 0, 0);
@@ -2433,18 +2491,22 @@ tbody.collapse.show {
   border-radius: 0.25rem; }
   .input-group-addon.form-control-sm,
   .input-group-sm > .input-group-addon,
-  .input-group-sm > .input-group-btn > .input-group-addon.btn, #loginWindow
+  .input-group-sm > .input-group-btn > .input-group-addon.btn, #defaultWindow
+  .input-group-sm > .input-group-btn > button.input-group-addon, #patternWindow
+  .input-group-sm > .input-group-btn > button.input-group-addon, #loginWindow
   .input-group-sm > .input-group-btn > button.input-group-addon, #projectWindow
-  .input-group-sm > .input-group-btn > button.input-group-addon, #editWindow
+  .input-group-sm > .input-group-btn > button.input-group-addon, #searchWindow
   .input-group-sm > .input-group-btn > button.input-group-addon {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
     border-radius: 0.2rem; }
   .input-group-addon.form-control-lg,
   .input-group-lg > .input-group-addon,
-  .input-group-lg > .input-group-btn > .input-group-addon.btn, #loginWindow
+  .input-group-lg > .input-group-btn > .input-group-addon.btn, #defaultWindow
+  .input-group-lg > .input-group-btn > button.input-group-addon, #patternWindow
+  .input-group-lg > .input-group-btn > button.input-group-addon, #loginWindow
   .input-group-lg > .input-group-btn > button.input-group-addon, #projectWindow
-  .input-group-lg > .input-group-btn > button.input-group-addon, #editWindow
+  .input-group-lg > .input-group-btn > button.input-group-addon, #searchWindow
   .input-group-lg > .input-group-btn > button.input-group-addon {
     padding: 0.75rem 1.5rem;
     font-size: 1.25rem;
@@ -2455,22 +2517,30 @@ tbody.collapse.show {
 
 .input-group .form-control:not(:last-child),
 .input-group-addon:not(:last-child),
-.input-group-btn:not(:last-child) > .btn, #loginWindow
+.input-group-btn:not(:last-child) > .btn, #defaultWindow
+.input-group-btn:not(:last-child) > button, #patternWindow
+.input-group-btn:not(:last-child) > button, #loginWindow
 .input-group-btn:not(:last-child) > button, #projectWindow
-.input-group-btn:not(:last-child) > button, #editWindow
+.input-group-btn:not(:last-child) > button, #searchWindow
 .input-group-btn:not(:last-child) > button,
-.input-group-btn:not(:last-child) > .btn-group > .btn, #loginWindow
+.input-group-btn:not(:last-child) > .btn-group > .btn, #defaultWindow
+.input-group-btn:not(:last-child) > .btn-group > button, #patternWindow
+.input-group-btn:not(:last-child) > .btn-group > button, #loginWindow
 .input-group-btn:not(:last-child) > .btn-group > button, #projectWindow
-.input-group-btn:not(:last-child) > .btn-group > button, #editWindow
+.input-group-btn:not(:last-child) > .btn-group > button, #searchWindow
 .input-group-btn:not(:last-child) > .btn-group > button,
 .input-group-btn:not(:last-child) > .dropdown-toggle,
-.input-group-btn:not(:first-child) > .btn:not(:last-child):not(.dropdown-toggle), #loginWindow
+.input-group-btn:not(:first-child) > .btn:not(:last-child):not(.dropdown-toggle), #defaultWindow
+.input-group-btn:not(:first-child) > button:not(:last-child):not(.dropdown-toggle), #patternWindow
+.input-group-btn:not(:first-child) > button:not(:last-child):not(.dropdown-toggle), #loginWindow
 .input-group-btn:not(:first-child) > button:not(:last-child):not(.dropdown-toggle), #projectWindow
-.input-group-btn:not(:first-child) > button:not(:last-child):not(.dropdown-toggle), #editWindow
+.input-group-btn:not(:first-child) > button:not(:last-child):not(.dropdown-toggle), #searchWindow
 .input-group-btn:not(:first-child) > button:not(:last-child):not(.dropdown-toggle),
-.input-group-btn:not(:first-child) > .btn-group:not(:last-child) > .btn, #loginWindow
+.input-group-btn:not(:first-child) > .btn-group:not(:last-child) > .btn, #defaultWindow
+.input-group-btn:not(:first-child) > .btn-group:not(:last-child) > button, #patternWindow
+.input-group-btn:not(:first-child) > .btn-group:not(:last-child) > button, #loginWindow
 .input-group-btn:not(:first-child) > .btn-group:not(:last-child) > button, #projectWindow
-.input-group-btn:not(:first-child) > .btn-group:not(:last-child) > button, #editWindow
+.input-group-btn:not(:first-child) > .btn-group:not(:last-child) > button, #searchWindow
 .input-group-btn:not(:first-child) > .btn-group:not(:last-child) > button {
   border-bottom-right-radius: 0;
   border-top-right-radius: 0; }
@@ -2480,22 +2550,30 @@ tbody.collapse.show {
 
 .input-group .form-control:not(:first-child),
 .input-group-addon:not(:first-child),
-.input-group-btn:not(:first-child) > .btn, #loginWindow
+.input-group-btn:not(:first-child) > .btn, #defaultWindow
+.input-group-btn:not(:first-child) > button, #patternWindow
+.input-group-btn:not(:first-child) > button, #loginWindow
 .input-group-btn:not(:first-child) > button, #projectWindow
-.input-group-btn:not(:first-child) > button, #editWindow
+.input-group-btn:not(:first-child) > button, #searchWindow
 .input-group-btn:not(:first-child) > button,
-.input-group-btn:not(:first-child) > .btn-group > .btn, #loginWindow
+.input-group-btn:not(:first-child) > .btn-group > .btn, #defaultWindow
+.input-group-btn:not(:first-child) > .btn-group > button, #patternWindow
+.input-group-btn:not(:first-child) > .btn-group > button, #loginWindow
 .input-group-btn:not(:first-child) > .btn-group > button, #projectWindow
-.input-group-btn:not(:first-child) > .btn-group > button, #editWindow
+.input-group-btn:not(:first-child) > .btn-group > button, #searchWindow
 .input-group-btn:not(:first-child) > .btn-group > button,
 .input-group-btn:not(:first-child) > .dropdown-toggle,
-.input-group-btn:not(:last-child) > .btn:not(:first-child), #loginWindow
+.input-group-btn:not(:last-child) > .btn:not(:first-child), #defaultWindow
+.input-group-btn:not(:last-child) > button:not(:first-child), #patternWindow
+.input-group-btn:not(:last-child) > button:not(:first-child), #loginWindow
 .input-group-btn:not(:last-child) > button:not(:first-child), #projectWindow
-.input-group-btn:not(:last-child) > button:not(:first-child), #editWindow
+.input-group-btn:not(:last-child) > button:not(:first-child), #searchWindow
 .input-group-btn:not(:last-child) > button:not(:first-child),
-.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > .btn, #loginWindow
+.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > .btn, #defaultWindow
+.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > button, #patternWindow
+.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > button, #loginWindow
 .input-group-btn:not(:last-child) > .btn-group:not(:first-child) > button, #projectWindow
-.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > button, #editWindow
+.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > button, #searchWindow
 .input-group-btn:not(:last-child) > .btn-group:not(:first-child) > button {
   border-bottom-left-radius: 0;
   border-top-left-radius: 0; }
@@ -2507,21 +2585,21 @@ tbody.collapse.show {
   position: relative;
   font-size: 0;
   white-space: nowrap; }
-  .input-group-btn > .btn, #loginWindow .input-group-btn > button, #projectWindow .input-group-btn > button, #editWindow .input-group-btn > button {
+  .input-group-btn > .btn, #defaultWindow .input-group-btn > button, #patternWindow .input-group-btn > button, #loginWindow .input-group-btn > button, #projectWindow .input-group-btn > button, #searchWindow .input-group-btn > button {
     position: relative;
     flex: 1; }
-    .input-group-btn > .btn + .btn, #loginWindow .input-group-btn > button + .btn, #projectWindow .input-group-btn > button + .btn, #editWindow .input-group-btn > button + .btn, #loginWindow .input-group-btn > .btn + button, #loginWindow .input-group-btn > button + button, #projectWindow .input-group-btn > .btn + button, #projectWindow .input-group-btn > button + button, #editWindow .input-group-btn > .btn + button, #editWindow .input-group-btn > button + button {
+    .input-group-btn > .btn + .btn, #defaultWindow .input-group-btn > button + .btn, #patternWindow .input-group-btn > button + .btn, #loginWindow .input-group-btn > button + .btn, #projectWindow .input-group-btn > button + .btn, #searchWindow .input-group-btn > button + .btn, #defaultWindow .input-group-btn > .btn + button, #defaultWindow .input-group-btn > button + button, #patternWindow .input-group-btn > .btn + button, #patternWindow .input-group-btn > button + button, #loginWindow .input-group-btn > .btn + button, #loginWindow .input-group-btn > button + button, #projectWindow .input-group-btn > .btn + button, #projectWindow .input-group-btn > button + button, #searchWindow .input-group-btn > .btn + button, #searchWindow .input-group-btn > button + button {
       margin-left: -1px; }
-    .input-group-btn > .btn:focus, #loginWindow .input-group-btn > button:focus, #projectWindow .input-group-btn > button:focus, #editWindow .input-group-btn > button:focus, .input-group-btn > .btn:active, #loginWindow .input-group-btn > button:active, #projectWindow .input-group-btn > button:active, #editWindow .input-group-btn > button:active, .input-group-btn > .btn:hover, #loginWindow .input-group-btn > button:hover, #projectWindow .input-group-btn > button:hover, #editWindow .input-group-btn > button:hover {
+    .input-group-btn > .btn:focus, #defaultWindow .input-group-btn > button:focus, #patternWindow .input-group-btn > button:focus, #loginWindow .input-group-btn > button:focus, #projectWindow .input-group-btn > button:focus, #searchWindow .input-group-btn > button:focus, .input-group-btn > .btn:active, #defaultWindow .input-group-btn > button:active, #patternWindow .input-group-btn > button:active, #loginWindow .input-group-btn > button:active, #projectWindow .input-group-btn > button:active, #searchWindow .input-group-btn > button:active, .input-group-btn > .btn:hover, #defaultWindow .input-group-btn > button:hover, #patternWindow .input-group-btn > button:hover, #loginWindow .input-group-btn > button:hover, #projectWindow .input-group-btn > button:hover, #searchWindow .input-group-btn > button:hover {
       z-index: 3; }
-  .input-group-btn:not(:last-child) > .btn, #loginWindow .input-group-btn:not(:last-child) > button, #projectWindow .input-group-btn:not(:last-child) > button, #editWindow .input-group-btn:not(:last-child) > button,
+  .input-group-btn:not(:last-child) > .btn, #defaultWindow .input-group-btn:not(:last-child) > button, #patternWindow .input-group-btn:not(:last-child) > button, #loginWindow .input-group-btn:not(:last-child) > button, #projectWindow .input-group-btn:not(:last-child) > button, #searchWindow .input-group-btn:not(:last-child) > button,
   .input-group-btn:not(:last-child) > .btn-group {
     margin-right: -1px; }
-  .input-group-btn:not(:first-child) > .btn, #loginWindow .input-group-btn:not(:first-child) > button, #projectWindow .input-group-btn:not(:first-child) > button, #editWindow .input-group-btn:not(:first-child) > button,
+  .input-group-btn:not(:first-child) > .btn, #defaultWindow .input-group-btn:not(:first-child) > button, #patternWindow .input-group-btn:not(:first-child) > button, #loginWindow .input-group-btn:not(:first-child) > button, #projectWindow .input-group-btn:not(:first-child) > button, #searchWindow .input-group-btn:not(:first-child) > button,
   .input-group-btn:not(:first-child) > .btn-group {
     z-index: 2;
     margin-left: -1px; }
-    .input-group-btn:not(:first-child) > .btn:focus, #loginWindow .input-group-btn:not(:first-child) > button:focus, #projectWindow .input-group-btn:not(:first-child) > button:focus, #editWindow .input-group-btn:not(:first-child) > button:focus, .input-group-btn:not(:first-child) > .btn:active, #loginWindow .input-group-btn:not(:first-child) > button:active, #projectWindow .input-group-btn:not(:first-child) > button:active, #editWindow .input-group-btn:not(:first-child) > button:active, .input-group-btn:not(:first-child) > .btn:hover, #loginWindow .input-group-btn:not(:first-child) > button:hover, #projectWindow .input-group-btn:not(:first-child) > button:hover, #editWindow .input-group-btn:not(:first-child) > button:hover,
+    .input-group-btn:not(:first-child) > .btn:focus, #defaultWindow .input-group-btn:not(:first-child) > button:focus, #patternWindow .input-group-btn:not(:first-child) > button:focus, #loginWindow .input-group-btn:not(:first-child) > button:focus, #projectWindow .input-group-btn:not(:first-child) > button:focus, #searchWindow .input-group-btn:not(:first-child) > button:focus, .input-group-btn:not(:first-child) > .btn:active, #defaultWindow .input-group-btn:not(:first-child) > button:active, #patternWindow .input-group-btn:not(:first-child) > button:active, #loginWindow .input-group-btn:not(:first-child) > button:active, #projectWindow .input-group-btn:not(:first-child) > button:active, #searchWindow .input-group-btn:not(:first-child) > button:active, .input-group-btn:not(:first-child) > .btn:hover, #defaultWindow .input-group-btn:not(:first-child) > button:hover, #patternWindow .input-group-btn:not(:first-child) > button:hover, #loginWindow .input-group-btn:not(:first-child) > button:hover, #projectWindow .input-group-btn:not(:first-child) > button:hover, #searchWindow .input-group-btn:not(:first-child) > button:hover,
     .input-group-btn:not(:first-child) > .btn-group:focus,
     .input-group-btn:not(:first-child) > .btn-group:active,
     .input-group-btn:not(:first-child) > .btn-group:hover {
@@ -3314,7 +3392,7 @@ tbody.collapse.show {
   .badge:empty {
     display: none; }
 
-.btn .badge, #loginWindow button .badge, #projectWindow button .badge, #editWindow button .badge {
+.btn .badge, #defaultWindow button .badge, #patternWindow button .badge, #loginWindow button .badge, #projectWindow button .badge, #searchWindow button .badge {
   position: relative;
   top: -1px; }
 
@@ -6125,6 +6203,22 @@ a:hover {
   position: absolute;
   height: 100%; }
 
+#debugInterface {
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  min-height: 300px;
+  width: 100%;
+  z-index: 1040;
+  display: none; }
+  #debugInterface * {
+    padding: 15px; }
+  #debugInterface span {
+    color: red;
+    display: block; }
+
 .navbar {
   background-color: rgba(255, 255, 255, 0.9); }
   .navbar li#userinfo, .navbar li#projectSelection {
@@ -6143,6 +6237,58 @@ a:hover {
     display: inline-block; }
   .navbar input {
     font-family: Sofia Pro Soft; }
+
+#patternWindow {
+  display: none;
+  position: fixed;
+  right: 100px;
+  top: 100px;
+  left: auto;
+  height: 800px;
+  z-index: 1040;
+  padding: 25px;
+  overflow-y: scroll;
+  transform: none !important; }
+  #patternWindow h5 {
+    text-align: left;
+    text-decoration: underline;
+    margin-top: 1em; }
+  #patternWindow h3 {
+    text-align: left; }
+  #patternWindow p {
+    margin-top: 0.5em; }
+  #patternWindow p#patternClass {
+    color: #159cc3;
+    margin-top: -1em; }
+  #patternWindow img {
+    max-width: 100%;
+    border-radius: 5px; }
+
+#patternWindow::-webkit-scrollbar {
+  width: 0.5em; }
+
+#patternWindow::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background-color: #107896;
+  outline: 1px solid slategrey; }
+
+#patternRelation #relationForm {
+  display: none; }
+
+#patternRelation #patternRelationTxtArea {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em; }
+
+#patternRelation h5 {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em; }
+
+#patternRelation button {
+  margin: 0.3em; }
+
+#patternRelation img {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em; }
 
 #hud {
   z-index: 10;
@@ -6173,133 +6319,72 @@ a:hover {
       padding: 0;
       margin: 0; }
 
-#loginWindow {
+#defaultWindow, #patternWindow, #loginWindow, #projectWindow, #searchWindow {
   display: none;
   z-index: 10;
   position: fixed;
   top: 33%;
   left: 50%;
   transform: translateX(-50%);
-  width: 270px;
-  border: 1px solid #010101;
-  border-radius: 5px;
-  background-color: rgba(0, 0, 0, 0.9);
-  padding: 30px;
-  text-align: center;
-  color: #FFF; }
-  #loginWindow #registerForm, #loginWindow #logoutNotice, #loginWindow #loginNotice {
-    display: none; }
-  #loginWindow h3 {
-    margin-bottom: 1em;
-    color: #FFFFFF; }
-  #loginWindow p {
-    color: #FFF;
-    text-align: center;
-    margin: 0; }
-  #loginWindow button {
-    margin-right: 0.25em;
-    margin-left: 0.25em;
-    font-family: Sofia Pro Soft;
-    background-color: #107896;
-    cursor: pointer;
-    display: box; }
-    #loginWindow button:hover {
-      background-color: #1284a5; }
-  #loginWindow textarea, #loginWindow input {
-    font-family: Sofia Pro Soft;
-    width: 100%;
-    max-width: 100%;
-    border-radius: 5px;
-    color: #AAA;
-    padding: 7px;
-    -webkit-box-shadow: inset 2px 2px 2px 0px #dddddd;
-    -moz-box-shadow: inset 2px 2px 2px 0px #dddddd;
-    box-shadow: inset 2px 2px 2px 0px #dddddd; }
-  #loginWindow a#forgotpassword, #loginWindow a#goToLogin, #loginWindow a#goToRegister, #loginWindow a#goBackToLogin {
-    color: #FFF;
-    font-size: 0.8em; }
-
-#projectWindow {
-  display: none;
-  z-index: 10;
-  position: fixed;
-  top: 33%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 290px;
-  border: 1px solid #010101;
-  border-radius: 5px;
-  background-color: rgba(0, 0, 0, 0.9);
-  padding: 30px;
-  text-align: center;
-  color: #FFF; }
-  #projectWindow h3 {
-    margin-bottom: 1em;
-    color: #FFFFFF; }
-  #projectWindow p {
-    color: #FFF;
-    text-align: left;
-    margin: 0; }
-  #projectWindow button {
-    margin-right: 0.25em;
-    margin-left: 0.25em;
-    font-family: Sofia Pro Soft;
-    background-color: #107896;
-    cursor: pointer;
-    display: box; }
-    #projectWindow button:hover {
-      background-color: #1284a5; }
-  #projectWindow textarea, #projectWindow input {
-    font-family: Sofia Pro Soft;
-    width: 100%;
-    max-width: 100%;
-    border-radius: 5px;
-    color: #AAA;
-    margin-bottom: 1.5em;
-    padding: 7px;
-    -webkit-box-shadow: inset 2px 2px 2px 0px #dddddd;
-    -moz-box-shadow: inset 2px 2px 2px 0px #dddddd;
-    box-shadow: inset 2px 2px 2px 0px #dddddd; }
-
-#editWindow {
-  z-index: 10;
-  position: fixed;
-  top: 10%;
-  right: 10%;
-  color: #CCC;
   width: 300px;
   border: 1px solid #010101;
   border-radius: 5px;
   background-color: rgba(0, 0, 0, 0.9);
+  padding: 20px;
   text-align: center;
-  display: none;
-  /*-webkit-box-shadow: 2px 2px 2px 0px #dddddd;
-		-moz-box-shadow: 2px 2px 2px 0px #dddddd;
-		box-shadow: 2px 2px 2px 0px #dddddd;*/
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -o-user-select: none;
-  -ms-user-select: none;
-  -khtml-user-select: none;
-  user-select: none; }
-  #editWindow .container-fluid {
-    padding: 0; }
-  #editWindow .row {
-    margin-bottom: 25px; }
-  #editWindow form {
-    width: 80%;
-    margin-top: 0.8em;
-    margin-bottom: 0.2em; }
-  #editWindow textarea, #editWindow input {
+  color: #FFF; }
+  #defaultWindow h3, #patternWindow h3, #loginWindow h3, #projectWindow h3, #searchWindow h3 {
+    margin-bottom: 0.75em;
+    color: #FFFFFF; }
+  #defaultWindow p, #patternWindow p, #loginWindow p, #projectWindow p, #searchWindow p {
+    color: #FFF;
+    text-align: left;
+    margin: 0; }
+  #defaultWindow a, #patternWindow a, #loginWindow a, #projectWindow a, #searchWindow a, #defaultWindow a:hover, #patternWindow a:hover, #loginWindow a:hover, #projectWindow a:hover, #searchWindow a:hover, #defaultWindow a:visited, #patternWindow a:visited, #loginWindow a:visited, #projectWindow a:visited, #searchWindow a:visited {
+    color: #107896;
+    text-decoration: none;
+    font-size: 0.8em; }
+    #defaultWindow a:hover, #patternWindow a:hover, #loginWindow a:hover, #projectWindow a:hover, #searchWindow a:hover, #defaultWindow a:hover:hover, #patternWindow a:hover:hover, #loginWindow a:hover:hover, #projectWindow a:hover:hover, #searchWindow a:hover:hover, #defaultWindow a:visited:hover, #patternWindow a:visited:hover, #loginWindow a:visited:hover, #projectWindow a:visited:hover, #searchWindow a:visited:hover {
+      color: #1284a5; }
+  #defaultWindow button, #patternWindow button, #loginWindow button, #projectWindow button, #searchWindow button {
+    margin: 0.3em;
+    font-family: Sofia Pro Soft;
+    background-color: #107896;
+    cursor: pointer;
+    display: box; }
+    #defaultWindow button:hover, #patternWindow button:hover, #loginWindow button:hover, #projectWindow button:hover, #searchWindow button:hover {
+      background-color: #1284a5; }
+  #defaultWindow textarea, #patternWindow textarea, #loginWindow textarea, #projectWindow textarea, #searchWindow textarea, #defaultWindow input, #patternWindow input, #loginWindow input, #projectWindow input, #searchWindow input {
     font-family: Sofia Pro Soft;
     width: 100%;
     max-width: 100%;
     border-radius: 5px;
+    color: #AAA;
     padding: 7px;
     -webkit-box-shadow: inset 2px 2px 2px 0px #dddddd;
     -moz-box-shadow: inset 2px 2px 2px 0px #dddddd;
     box-shadow: inset 2px 2px 2px 0px #dddddd; }
-  #editWindow input#uploadInput {
+
+#loginWindow #registerForm, #loginWindow #logoutNotice, #loginWindow #loginNotice {
+  display: none; }
+
+#loginWindow p {
+  color: #FFF;
+  text-align: center;
+  margin: 0; }
+
+#loginWindow a#forgotpassword, #loginWindow a#goToLogin, #loginWindow a#goToRegister, #loginWindow a#goBackToLogin {
+  color: #FFF;
+  font-size: 0.8em; }
+
+#patternEdit, #patternClassEdit {
+  display: none; }
+  #patternEdit .container-fluid, #patternClassEdit .container-fluid {
+    padding: 0; }
+  #patternEdit form, #patternClassEdit form {
+    width: 90%;
+    /*margin-top: 0.8em; margin-bottom:0.2em;*/ }
+  #patternEdit input#uploadInput, #patternClassEdit input#uploadInput {
     max-width: 100%;
     font-size: 0.8em;
     font-family: Sofia Pro Soft;
@@ -6311,23 +6396,6 @@ a:hover {
     padding-left: 0;
     padding-right: 0;
     margin-bottom: 0.5em; }
-  #editWindow p {
-    color: #FFF;
-    text-align: left;
-    margin: 0; }
-  #editWindow img#patternDiagram {
+  #patternEdit img#patternDiagram, #patternClassEdit img#patternDiagram {
     max-width: 100%;
     border-radius: 5px; }
-  #editWindow button {
-    margin-right: 0.5em;
-    font-family: Sofia Pro Soft;
-    background-color: #107896;
-    cursor: pointer; }
-    #editWindow button:hover {
-      background-color: #1284a5; }
-  #editWindow a, #editWindow a:hover, #editWindow a:visited {
-    color: #107896;
-    text-decoration: none;
-    font-size: 0.8em; }
-    #editWindow a:hover, #editWindow a:hover:hover, #editWindow a:visited:hover {
-      color: #1284a5; }

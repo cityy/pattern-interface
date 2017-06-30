@@ -1,10 +1,11 @@
 require('../scss/index.scss');
-var vis_ = require('./vis_network.js');
+var visjs = require('./vis_network.js');
 window.jQuery = window.$ = require('jquery');
 global.Tether = require('tether');
 require('bootstrap');
 require("font-awesome-webpack");
 require('jquery-form');
+var isDebug = false;
 
 /*
 /* ================================
@@ -12,20 +13,81 @@ require('jquery-form');
 /* ================================
 */ 
 
+visjs.initCommonNetwork().then(function(network){
+	visjs.network = network;
+
+/*var projectReq = new XMLHttpRequest();
+projectReq.open('GET', '/nodes/someproject', true);
+    projectReq.onload = function() {
+   		if (projectReq.status === 200) { 
+   			console.log(projectReq.responseText); 
+   		}
+    	else { console.log('Error' + projectReq.statusText); } 
+	} // onload()
+	projectReq.send(null);*/
+
 var addNodeLink = document.getElementById("addNode");
 var deleteNodesLink = document.getElementById("deleteNodes");
 var connectNodesLink = document.getElementById("connectNodes");
 var editNodeLink = document.getElementById('editNode');
+var swapEdgeLink = document.getElementById('swapEdge');
 
-addNodeLink.addEventListener( "click", function() { vis_.addNode(); }); 
+visjs.network.on('selectNode', function(){ checkHudDisable(); }  );
+visjs.network.on('deselectNode', function(){ checkHudDisable(); }  );
+visjs.network.on('selectEdge', function(){ checkHudDisable(); }  );
+visjs.network.on('deselectEdge', function(){ checkHudDisable(); }  );
+visjs.network.on('dragEnd', function(){ checkHudDisable(); }  );
 
-deleteNodesLink.addEventListener("click", function(){ vis_.deleteSelectedNode(); });
+swapEdgeLink.addEventListener('click', function(){
+	visjs.swapEdgeDirection();
+});
 
-connectNodesLink.addEventListener("click",function(){ vis_.connectSelectedNodes(); });
+// debug window toggle
+window.addEventListener('keydown', function(e){
+	let keyCode = e.keyCode;
+	if(keyCode === 220){ // ^
+		toggleDebug();
+	}
+});
+
+//todo:
+//function toggleLogin(){};
+//function toggleEdit(){};
+//function toggleReg(){};
+//function toggleAddProject(){};
+
+function toggleDebug(){
+	let debugInterface = document.getElementById('debugInterface');
+	if(isDebug){
+		debugInterface.style.display = 'none';
+		isDebug = false;
+	}
+	else{
+		visjs.feedDebugger();
+		debugInterface.style.display = 'block';
+		isDebug = true;
+	}
+}
+
+addNodeLink.addEventListener( "click", function() { 
+	visjs.addNode(); checkHudDisable(); 
+}); 
+
+deleteNodesLink.addEventListener("click", function(){ 
+	visjs.deleteSelectedNodes(); checkHudDisable();
+});
+
+connectNodesLink.addEventListener("click",function(){ visjs.connectSelectedNodes(); });
 
 editNodeLink.addEventListener("click", function(){ 
 	if ( editNodeLink.classList.contains('disabled') === false ){
-		vis_.editSelectedNode();
+		if(visjs.network.getSelectedNodes().length === 0 && visjs.network.getSelectedEdges().length === 1){
+			visjs.editSelectedEdge();
+		}
+		else if(visjs.network.getSelectedNodes().length === 2){
+			visjs.editSelectedEdge();
+		}
+		else{visjs.editSelectedNode();}
 	}
 	else{
 		console.log('Either no nodes selected or more than one node selected.');
@@ -67,6 +129,9 @@ var loginNoticeDismiss = document.getElementById('loginDismiss');
 var loginForm = document.getElementById('loginForm');
 var registerForm = document.getElementById('registerForm');
 
+var searchWindow = document.getElementById('searchWindow');
+var searchForm = document.getElementById('searchForm');
+
 loginLink.addEventListener('click',function(){
 	logoutNotice.style.display = 'none';
 	loginWindow.style.display = 'block';
@@ -79,7 +144,7 @@ registerLink.addEventListener('click', function(){
 	loginWindow.style.display = 'block';
 	loginForm.style.display = 'none';
 	registerForm.style.display = 'block';
-})
+});
 
 loginWindow.addEventListener("mousedown", function(e){
 	if (loginWindow !== e.target && loginWindowParagraphs !== e.target ) return;
@@ -130,7 +195,6 @@ loginNoticeDismiss.addEventListener('click', function(e){
 });
 
 
-
 // Submission of the registration form
 $('#registerForm').unbind('submit').bind('submit', function(event){
 	event.preventDefault();
@@ -146,6 +210,7 @@ $('#registerForm').unbind('submit').bind('submit', function(event){
                 console.log('User ' + newusername + ' successfully registered and logged in.');
 				showUserInfo(newusername);
 				document.getElementById('hud').style.display = 'block';
+				visjs.createDefaultProjectNetwork();
 				refreshProjectList();
                 document.getElementById('projectSelection').style.display = 'list-item';
             },
@@ -232,7 +297,6 @@ function getCurrentUser(){
 
 document.onload = getCurrentUser();
 
-
 // ==================================================
 // HANDLE USER PROJECTS
 // ==================================================
@@ -260,7 +324,7 @@ dismissProjectWindowButton.addEventListener('click', function(){
 });
 
 // save new project to db and add it to the project selection
-saveNewProjectButton.addEventListener('click', function(){
+/*saveNewProjectButton.addEventListener('click', function(){
    	projectWindow.style.display = 'none';
 
    	let data = {
@@ -279,7 +343,7 @@ saveNewProjectButton.addEventListener('click', function(){
 	refreshProjectList().then(function(){
 		selectProject(data.projectTitle);
 	});
-});
+});*/
 
 function selectProject(sel){
 	if(sel.options){ // if subitted parameter is a <select>
@@ -297,8 +361,9 @@ function selectProject(sel){
 		}
 	}
 	// destroy the current network
+	visjs.network.destroy();
 	// get all patterns and edges of the current project
-		// vis_.loadProject(selectedProject);
+		// visjs.loadProject(selectedProject);
 }
 
 function refreshProjectList(){
@@ -307,10 +372,12 @@ function refreshProjectList(){
 		getProjectsReq.open('GET', '/projects', true);
 	   	getProjectsReq.onload = function() {
 	   		if (getProjectsReq.status === 200) { 
-	   			projectOptions = JSON.parse(getProjectsReq.responseText); //responseText should be an array of projects
-				for(let i in projectOptions){
-					projectOptions[i] = '<option>' + projectOptions[i] + '</option>'
+	   			let projects = JSON.parse(getProjectsReq.responseText); //responseText should be an array of projects
+				let projectOptions = [];
+				for(let i in projects){
+					projectOptions[i] = '<option>' + projects[i].name + '</option>'
 				}
+				projectOptions.push('<option id="manageUserProjects">Manage projects...</option>');
 				document.getElementById('userprojects').innerHTML = projectOptions;
 				resolve('Projects refrehsed successfully');
 	   		}
@@ -321,17 +388,17 @@ function refreshProjectList(){
 }
 
 // ================================
-// EDIT WINDOW
+// PATTERN WINDOW
 // ================================
 
-var editWindow = document.getElementById('editWindow');
-var editWindowParagraphs = editWindow.getElementsByTagName('P')[0];
-editWindow.addEventListener("mousedown", function(e){
-	if (editWindow !== e.target && editWindowParagraphs !== e.target ) return;
+var patternWindow = document.getElementById('patternWindow');
+var patternWindowParagraphs = patternWindow.getElementsByTagName('P')[0];
+patternWindow.addEventListener("mousedown", function(e){
+	if (patternWindow !== e.target && patternWindowParagraphs !== e.target ) return;
 	dragWindow.startMoving(this, 'page', e);
 	e.preventDefault();
 });
-editWindow.addEventListener("mouseup", function(){
+patternWindow.addEventListener("mouseup", function(){
 	dragWindow.stopMoving('page');
 });
 
@@ -339,6 +406,43 @@ editWindow.addEventListener("mouseup", function(){
 // ================================
 // UI FUNCTIONALITY
 // ================================
+
+function checkHudDisable() { // check if HUD buttons need to be disabled, depending on what is selected
+    let selectedNodes = visjs.network.getSelectedNodes();
+    let selectedEdges = visjs.network.getSelectedEdges();
+
+    switch(selectedNodes.length){
+        /*case 0:
+            $('#deleteNodes').className += ' disabled'; // disable delete
+            break;*/
+        case 0:
+            document.getElementById("editNode").className = " disabled"; // disable edit
+            document.getElementById("deleteNodes").className = " disabled"; // disable delete
+            document.getElementById("connectNodes").className = " disabled"; // disable connect
+            if(selectedEdges.length > 0){ 
+            	$('#deleteNodes').removeClass('disabled'); 
+            	$('#editNode').removeClass('disabled'); //enable Edit of edges
+            } // enable delete for edges             
+            break;
+        case 1:
+            $('#editNode').removeClass('disabled'); //enable Edit
+            $('#deleteNodes').removeClass('disabled'); // enable delete
+            break;
+        case 2: 
+            $("#connectNodes").removeClass('disabled'); // enable connect
+            //document.getElementById("editNode").className = " disabled"; // disable edit
+            $('#editNode').removeClass('disabled'); //enable Edit of relations
+            break;
+        case 3:
+            document.getElementById("connectNodes").className = " disabled"; // disable connect
+            break;
+        default:
+            document.getElementById("editNode").className = " disabled"; // disable edit
+            $('#deleteNodes').removeClass('disabled'); // enable delete
+            document.getElementById("connectNodes").className = " disabled"; // disable connect
+    } //switch
+} // checkHudDisable();     
+
 
 var dragWindow = function(){
     return {
@@ -385,6 +489,8 @@ var dragWindow = function(){
         },
     }
 }();
+
+});//initNetwork.then
 
 /*$(document).click(function(e) {
     if (e.shiftKey) {

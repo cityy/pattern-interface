@@ -16,6 +16,24 @@ a:hover{ color:#107896; }
 #container{ position:absolute; height: 100%; }
 
 // ===============================================
+// Debugging Interface
+// ===============================================
+
+#debugInterface{
+	position: fixed;
+	left: 0;
+	top: 0;
+	background-color: rgba(0,0,0, 0.8);
+	color: white;
+	min-height: 300px;
+	width: 100%;
+	z-index: 1040;
+	display: none;
+	*{padding: 15px;}
+	span{color:red;display:block;}
+}
+
+// ===============================================
 // Navbar
 // ===============================================
 
@@ -28,6 +46,56 @@ a:hover{ color:#107896; }
 	.form-control{ padding: 0.2rem 0.4rem; font-size: 0.8rem; vertical-align:baseline;}
 	.nav-link{display:inline-block;}
 	input{font-family: Sofia Pro Soft;}
+}
+
+// ===============================================
+// Pattern Content
+// ===============================================
+
+#patternWindow{
+	display:none;
+	position: fixed;
+	right:100px;
+	top: 100px;
+	left:auto;
+	//bottom: 100px;
+	height: 800px;
+	z-index: 1040;
+	padding: 25px;
+	overflow-y: scroll;
+	transform: none !important;
+	h5{text-align:left; text-decoration:underline; margin-top:1em;}
+	h3{text-align:left;}
+	p{margin-top:0.5em;}
+	p#patternClass{color:#107896*1.3; margin-top:-1em;}
+	img{max-width:100%; border-radius:5px;}
+	@extend #defaultWindow;
+
+}
+
+#patternWindow::-webkit-scrollbar {
+    width: 0.5em;
+}
+ 
+#patternWindow::-webkit-scrollbar-track {
+    //-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+ 
+#patternWindow::-webkit-scrollbar-thumb {
+	border-radius:3px;
+	background-color: #107896;
+	outline: 1px solid slategrey;
+}
+
+#patternRelation{
+	#relationForm{display:none;}
+	#patternRelationTxtArea{margin-top:0.5em; margin-bottom:0.5em;} 
+	h5{margin-top:0.5em; margin-bottom:0.5em;}
+	button{ margin:0.3em; }
+	img{
+		margin-top:0.5em;
+		margin-bottom:0.5em;
+	}
 }
 
 // ===============================================
@@ -60,31 +128,32 @@ a:hover{ color:#107896; }
 }  //#hud
 
 // ===============================================
-// Login Window
+// Default Window
 // ===============================================
 
-#loginWindow{
+#defaultWindow{
 	display: none;
 	z-index: 10;
 	position: fixed;
 	top:33%;
 	left: 50%;
 	transform: translateX(-50%);
-	width:270px;
+	width:300px;
 	border: 1px solid #010101;
 	border-radius: 5px;
 	background-color: rgba(0,0,0,0.9);
-	padding: 30px;
+	padding: 20px;
 	text-align:center;
 	color: #FFF;
-	#loginForm{}
-	#registerForm, #logoutNotice, #loginNotice{ display:none; }
-	h3{margin-bottom:1em; color:#FFFFFF;}
-	p{color:#FFF; text-align:center; margin: 0;}
+	h3{margin-bottom:0.75em; color:#FFFFFF;}
+	p{color:#FFF; text-align:left; margin: 0;}
+	a, a:hover, a:visited{
+		color: #107896; text-decoration:none; font-size:0.8em;
+		&:hover{color:#107896*1.1;}
+	}
 	button{
 		@extend .btn; @extend .btn-primary;  
-		margin-right: 0.25em;
-		margin-left: 0.25em;
+		margin: 0.3em;
 		font-family: Sofia Pro Soft; 
 		background-color: #107896;
 		cursor:pointer;
@@ -97,12 +166,23 @@ a:hover{ color:#107896; }
 		max-width: 100%;
 		border-radius: 5px;
 		color: #AAA;
+		//margin-bottom: 0.2em;
 
 		padding: 7px;
 		-webkit-box-shadow: inset 2px 2px 2px 0px #dddddd;
 		-moz-box-shadow: inset 2px 2px 2px 0px #dddddd;
 		box-shadow: inset 2px 2px 2px 0px #dddddd;
 	}
+}
+
+// ===============================================
+// Login Window
+// ===============================================
+
+#loginWindow{
+	@extend #defaultWindow;
+	#registerForm, #logoutNotice, #loginNotice{ display:none; }
+	p{color:#FFF; text-align:center; margin: 0;}
 	a#forgotpassword, a#goToLogin, a#goToRegister, a#goBackToLogin{ color: #FFF; font-size: 0.8em; }
 }
 
@@ -111,89 +191,18 @@ a:hover{ color:#107896; }
 // ===============================================
 
 #projectWindow{
-	display: none;
-	z-index: 10;
-	position: fixed;
-	top:33%;
-	left: 50%;
-	transform: translateX(-50%);
-	width:290px;
-	border: 1px solid #010101;
-	border-radius: 5px;
-	background-color: rgba(0,0,0,0.9);
-	padding: 30px;
-	text-align:center;
-	color: #FFF;	
-	h3{margin-bottom:1em; color:#FFFFFF;}
-	p{color:#FFF; text-align:left; margin: 0;}
-	button{
-		@extend .btn; @extend .btn-primary;  
-		margin-right: 0.25em;
-		margin-left: 0.25em;
-		font-family: Sofia Pro Soft; 
-		background-color: #107896;
-		cursor:pointer;
-		&:hover{background-color: #107896*1.1;} 
-		display:box;
-	}
-	textarea, input{
-		font-family: Sofia Pro Soft;
-		width: 100%;
-		max-width: 100%;
-		border-radius: 5px;
-		color: #AAA;
-		margin-bottom: 1.5em;
-
-		padding: 7px;
-		-webkit-box-shadow: inset 2px 2px 2px 0px #dddddd;
-		-moz-box-shadow: inset 2px 2px 2px 0px #dddddd;
-		box-shadow: inset 2px 2px 2px 0px #dddddd;
-	}
+	@extend #defaultWindow;
 }
 
 // ===============================================
 // Edit Node Window
 // ===============================================
 
-#editWindow{
-	z-index: 10;
-	position: fixed;
-	top: 10%;
-	right:10%;
-	color: #CCC;
-	width: 300px;
-	border: 1px solid #010101;
-	border-radius: 5px;
-	background-color: rgba(0,0,0,0.9);
-	text-align: center;
+#patternEdit, #patternClassEdit{
 	display: none;
-
-			/*-webkit-box-shadow: 2px 2px 2px 0px #dddddd;
-		-moz-box-shadow: 2px 2px 2px 0px #dddddd;
-		box-shadow: 2px 2px 2px 0px #dddddd;*/
-
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                -o-user-select: none;
-                -ms-user-select: none;
-                -khtml-user-select: none;     
-                user-select: none;
-
 	.container-fluid{ padding: 0;}
-	.row{ margin-bottom: 25px; }
 
-	form{ width: 80%; margin-top: 0.8em; margin-bottom:0.2em;}
-	textarea, input{
-		font-family: Sofia Pro Soft;
-		width: 100%;
-		max-width: 100%;
-		border-radius: 5px;
-
-		padding: 7px;
-		-webkit-box-shadow: inset 2px 2px 2px 0px #dddddd;
-		-moz-box-shadow: inset 2px 2px 2px 0px #dddddd;
-		box-shadow: inset 2px 2px 2px 0px #dddddd;
-	}
+	form{ width: 90%; /*margin-top: 0.8em; margin-bottom:0.2em;*/}
 	input#uploadInput{
 		max-width: 100%;
 		font-size: 0.8em;
@@ -207,18 +216,13 @@ a:hover{ color:#107896; }
 		padding-right: 0;
 		margin-bottom:0.5em;
 	}
-	p{color:#FFF; text-align:left; margin: 0;}
 	img#patternDiagram{ max-width: 100%; border-radius: 5px; }
-	button{
-		@extend .btn; @extend .btn-primary; 
-		margin-right:0.5em; 
-		font-family: Sofia Pro Soft; 
-		background-color: #107896;
-		cursor:pointer;
-		&:hover{background-color: #107896*1.1;}
-	}
-	a, a:hover, a:visited{
-		color: #107896; text-decoration:none; font-size:0.8em;
-		&:hover{color:#107896*1.1;}
-	}
+}
+
+// ===============================================
+// Search Window
+// ===============================================
+
+#searchWindow{
+	@extend #defaultWindow;
 }

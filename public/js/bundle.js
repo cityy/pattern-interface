@@ -17262,11 +17262,88 @@ module.exports = g;
 /***/ (function(module, exports, __webpack_require__) {
 
 var vis = __webpack_require__(18);
+//window.jQuery = window.$ = require('jquery');
 var network;
 network = {};
 var nodesObj = {};
 var edgesObj = {};
 var imgDir = '../img/';
+var container = document.getElementById('patternLanguage');
+var selectedNodesArr = [];
+
+// =========================================================
+// VISJS NETWORK OPTIONS
+// =========================================================
+
+var chosenNode = function(values, id, selected, hovering) {
+    values.borderWidth = 20;
+    values.borderColor = '#1287A8';
+}
+
+var options = {
+    layout: {
+        hierarchical:{ enabled: false, levelSeparation: 300, nodeSpacing: 2000, sortMethod: 'directed', },
+    }, // layout
+    interaction:{ multiselect: true, },
+
+    nodes: {
+        widthConstraint:{
+            //   enabled: true,
+            minimum: 150,
+            maximum: 190,
+        },
+        //shape: 'circularImage',
+        shape: 'circle',
+        size: 150,
+        shapeProperties:{ interpolation: false, },
+        chosen:{ label: false, node: chosenNode, },
+        borderWidth: 15,
+        borderWidthSelected: 15,
+        labelHighlightBold: false,
+        font: {
+            size: 28,
+            face: 'Sofia Pro Soft',
+            color: '#010101',
+            strokeWidth: 12,
+            strokeColor: '#FFF',
+            vadjust: 14,
+        }, // font
+        color: {
+            border: '#EFEFEF',
+            background: '#EFEFEF',
+            highlight: { background: '#1287A8', border: '#1287A8' }
+        }, // color
+    }, // nodes
+
+    edges:{
+        smooth:{
+            enabled: false,
+            roundness: 0.1,
+            type: 'diagonalCross',
+        },
+        arrows:{ to: { enabled: true, type: 'arrow', scaleFactor: 1.8 }, },
+        arrowStrikethrough: true,
+        width: 1,
+        selectionWidth: 1,
+        length: 1000,
+        color: { color: '#DEDEDE', highlight: '#107896' },
+    }, // edges
+
+    physics: {
+        enabled: false,
+        solver: 'barnesHut',
+        barnesHut:{
+            avoidOverlap: 0.75,
+            springLength: 400,
+            centralGravity: 0,
+        },
+        hierarchicalRepulsion:{
+            nodeDistance: 500,
+            springLength: 200,
+            centralGravity: 0,
+        },
+    }, // physics
+}; // options
 
 // =========================================================
 // FUNCTIONS TO HANDLE DATABASE INTERACTION / HTTP REQUESTS
@@ -17390,7 +17467,6 @@ function getIds(dataSet){
         for (let i = 0; i < currentDataCount; i++ ) { 
             currentIds[i] = dataSet[i].vId; 
         }
-        //console.log('currentIds: ' + currentIds);
         currentIds.sort(function(a,b){return b-a}); // sort currently used ids in descending order
         newId = currentIds[0] + 1; // newId is the currently highest id +1
     }
@@ -17403,12 +17479,10 @@ function getIds(dataSet){
 // INITIALIZING THE GRAPH - GET ALL NODES & EDGES FROM DB
 // =========================================================
 
-getAll( ["/nodes", "/edges"] ).then(function(responseArr){
-    let allNodes = responseArr[0]; // get nodes from db
-    let allEdges = responseArr[1]; // get edges from db
-    var nodesArray = []; // array of Node Objects
-    var edgesArray = []; // array of Edge Objects
+var visjsInterface = {};
 
+function pushNodes(allNodes){
+    let nodesArray = [];
     // loop through the nodes responded by the server
     for ( let i = 0; i < allNodes.length ; i++ ){
         // create initial Nodes
@@ -17423,6 +17497,11 @@ getAll( ["/nodes", "/edges"] ).then(function(responseArr){
         node.instruction = allNodes[i].instruction;
         nodesArray.push( node ); // append each i to the nodes Array
     } // for i < allNodes.length
+    return nodesArray;
+}
+
+function pushEdges(allEdges){
+    let edgesArray = [];
     // create initial edges
     if (allEdges.length > 0) {
         for(let i = 0; i < allEdges.length; i++){
@@ -17430,204 +17509,345 @@ getAll( ["/nodes", "/edges"] ).then(function(responseArr){
             edge.from = allEdges[i].fromId;
             edge.to = allEdges[i].toId;
             edge.id = allEdges[i].vId;
+            edge.text = allEdges[i].text;
             edgesArray.push( edge );
         } // for
     } //  if i > 0
-    // convert Edges and Nodes Arrays to Objects
-    nodesObj = new vis.DataSet( nodesArray );
-    edgesObj = new vis.DataSet( edgesArray );
+    return edgesArray;
+}
 
-    // ==================================================
-    // GET THE NODE NETWORK CONTAINER DIV
-    // ==================================================
-    
-    var container = document.getElementById('patternLanguage');
-
-    // ==================================================
-    // 05 GATHER THE NODES/EDGES DATA AND SET OPTIONS
-    // ==================================================
-
-    var data = {
-        nodes: nodesObj,
-        edges: edgesObj
-    };
-
-    var chosenNode = function(values, id, selected, hovering) {
-        values.borderWidth = 20;
-        values.borderColor = '#1287A8';
+function updateNodePosition(selection){
+    // record new node position
+    if(selection.nodes.length > 0){
+        let draggedNode = nodesObj.get(selection.nodes); // array
+        for(let i in draggedNode){
+            draggedNode[i].x = selection.pointer.canvas.x;
+            draggedNode[i].y = selection.pointer.canvas.y;
+        }
+        nodesObj.update(draggedNode);
     }
+}
 
-    var options = {
-        layout: {
-            hierarchical:{ enabled: false, levelSeparation: 300, nodeSpacing: 2000, sortMethod: 'directed', },
-        }, // layout
-        interaction:{ multiselect: true, },
-
-        nodes: {
-            shape: 'circularImage',
-            size: 100,
-            shapeProperties:{ interpolation: false, },
-            chosen:{ label: false, node: chosenNode, },
-            borderWidth: 20,
-            borderWidthSelected: 15,
-            labelHighlightBold: false,
-            font: {
-                size: 22,
-                face: 'Sofia Pro Soft',
-                color: '#010101',
-                strokeWidth: 12,
-                strokeColor: '#FFF',
-                vadjust: 14,
-            }, // font
-            color: {
-                border: '#010101',
-                background: '#FFFFFF',
-                highlight: { background: '#FFFFFF', border: '#1287A8' }
-            }, // color
-        }, // nodes
-
-        edges:{
-            smooth:{
-                enabled: false,
-                roundness: 0.1,
-                type: 'diagonalCross',
-            },
-            arrows:{ to: { enabled:true, type: 'arrow' }, },
-            arrowStrikethrough: true,
-            width: 12,
-            selectionWidth: 0,
-            length: 1000,
-            color: { color: '#010101', highlight: '#107896' },
-        }, // edges
-
-        physics: {
-            solver: 'barnesHut',
-            barnesHut:{
-                avoidOverlap: 0.75,
-                springLength: 400,
-                centralGravity: 0,
-            },
-            hierarchicalRepulsion:{
-                nodeDistance: 500,
-                springLength: 200,
-                centralGravity: 0,
-            },
-        }, // physics
-    }; // options
-
-    // ==================================================
-    // 06 INITIALIZE THE GRAPH USING vis.Network()
-    // ==================================================
-
-    network = new vis.Network(container, data, options);
-
-    // ==================================================
-    // vis.Network() events
-    // ==================================================
-
-    network.on('selectNode', function(selection){ 
-        checkHudDisable(); 
-        if(selection.nodes.length < 2){
-            let selectedNode = nodesObj.get(selection.nodes[0]);
-            console.log(selectedNode.x);
-            nodesObj.add([
-                    {id: -1, label: 'Observation:\n\n' + selectedNode.problem + '\n\n', physics: true, shape: 'box', x: selectedNode.x-200, y: selectedNode.y+500, fixed: {x: true, y:true }, widthConstraint:{maximum: 400}, color:{background: '#1287A8', border: '#1287A8'}, font:{color:'#FFF', strokeWidth: 0, align: 'left'}, },
-                    {id: -2, label: 'Instruction:\n\n' + selectedNode.instruction + '\n\n', physics: true, shape: 'box', x: selectedNode.x+200, y: selectedNode.y+500, fixed: {x: true, y:true }, widthConstraint:{maximum: 400}, color:{background: '#1287A8', border: '#1287A8'}, font:{color:'#FFF', strokeWidth: 0, align: 'left'}, }
-                ]);
-            edgesObj.add([
-                    {id: -1, from: selection.nodes[0], to: -1, length: 500, color:{color: '#1287A8'}, arrows:{to:{enabled: false},}, dashes: [10,20],},
-                    {id: -2, from: selection.nodes[0], to: -2, length: 500, color:{color: '#1287A8'}, arrows:{to:{enabled: false},}, dashes: [10,20],},
-                ]);
-            console.log(selection.nodes);
-        }
-        else{
-            nodesObj.remove([-1,-2]);
-        }
+visjsInterface.initProjectNetwork = function(projectname){
+    return new Promise(function(resolve, reject){
+        getAll(["/nodes/" + projectname, '/edges/' + projectname]).then(function(responseArr){
+            let allNodes = responseArr[0];
+            let allEdges = responseArr[1];
+            // convert arrays returned by the db to visjs format
+            var nodesArray = pushNodes(allNodes);
+            var edgesArray = pushEdges(allEdges);
+            // convert Edges and Nodes Arrays to visjs Objects
+            nodesObj = new vis.DataSet( nodesArray );
+            edgesObj = new vis.DataSet( edgesArray );
+        }) // getAll()
     });
+} // initProjectNetwork()
 
-    network.on('selectEdge', function(){ checkHudDisable() });
+// =========================================================
+// UI ELEMENTS
+// =========================================================
+let patternEdit = document.getElementById('patternEdit');
+var patternClassEdit = document.getElementById('patternClassEdit');
 
-    network.on('dragEnd', function(selection){
-        // record new node position
-        if(selection.nodes){
-            let draggedNode = nodesObj.get(selection.nodes); // array
-            for(let i in draggedNode){
-                draggedNode[i].x = selection.pointer.canvas.x;
-                draggedNode[i].y = selection.pointer.canvas.y;
-            }
-            nodesObj.update(draggedNode);
-        }
-        checkHudDisable();
-    });
+let patternWindow = document.getElementById('patternWindow')
+let patternContent = document.getElementById('patternContent');
+let patternRelation = document.getElementById('patternRelation');
+let patternTitle = document.getElementById('patternTitle');
+let patternObservation = document.getElementById('patternObservation');
+let patternInstruction = document.getElementById('patternInstruction');
+let patternContentDiagram = document.getElementById('patternContentDiagram');
 
-    network.on('deselectEdge', function(){ checkHudDisable(); });
-    
-    network.on('deselectNode', function(){ 
-        checkHudDisable(); 
-        nodesObj.remove([-1, -2]);
-        edgesObj.remove([-1, -2]);
-    });
+let patternRelationTitleA = document.getElementById('patternRelationTitleA');
+let patternRelationTitleB = document.getElementById('patternRelationTitleB');
+let relationText = document.getElementById('relationText');
+let patternRelationDiagramA = document.getElementById('patternRelationDiagramA');
+let patternRelationDiagramB = document.getElementById('patternRelationDiagramB');
 
-    network.on('doubleClick', function(selection){
-        //if( selection.nodes.length > 0 ) { editNode(); }
-            let clickLocation = { 
-                clickX: selection.pointer.canvas.x,
-                clickY: selection.pointer.canvas.y,
+let patternRelationTxtArea = document.getElementById('patternRelationTxtArea');
+let relationForm = document.getElementById('relationForm');
+
+let searchWindow = document.getElementById('searchWindow');
+
+
+visjsInterface.initCommonNetwork = function(){
+    return new Promise( function(resolve, reject){
+        getAll( ["/nodes", "/edges"] ).then(function(responseArr){
+            let allNodes = responseArr[0]; // get nodes from db
+            let allEdges = responseArr[1]; // get edges from db
+            // convert arrays returned by the db to visjs format
+            var nodesArray = pushNodes(allNodes);
+            var edgesArray = pushEdges(allEdges);
+            // convert Edges and Nodes Arrays to visjs Objects
+            nodesObj = new vis.DataSet( nodesArray );
+            edgesObj = new vis.DataSet( edgesArray );
+            // 05 GATHER THE NODES/EDGES DATA AND SET OPTIONS
+            var data = {
+                nodes: nodesObj,
+                edges: edgesObj
+            };
+            // 06 INITIALIZE THE GRAPH USING vis.Network()
+            network = new vis.Network(container, data, options);
+
+            // ==================================================
+            // vis.Network() events (TODO: TURN EVENT ACTIONS INTO FUNCTIONS FOR REUSE)
+            // ==================================================
+
+            var previousConnectedNodes = [];
+            var previousConnectedEdges = [];
+            function getConnectedNodes(selection){
+                // color connected nodes black
+                let connectedNodeIds = network.getConnectedNodes(selection.nodes[0]);
+                let connectedNodes = nodesObj.get(connectedNodeIds);
+                let selectedNodes = nodesObj.get(selection.nodes);
+                let connectedEdgeIds = network.getConnectedEdges(selection.nodes[0]);
+                let connectedEdges = edgesObj.get(connectedEdgeIds);
+                let updateDataNodes = [];
+                let updateDataEdges = [];
+
+                for(let i in connectedNodeIds){
+                    let gatherAngle = ( (360/connectedNodeIds.length)*i ) / 180 * Math.PI;
+                    updateDataNodes[i] = {};
+                    updateDataNodes[i].id = connectedNodes[i].id;
+                    updateDataNodes[i].prevX = connectedNodes[i].x;
+                    updateDataNodes[i].prevY = connectedNodes[i].y;
+                    updateDataNodes[i].id = connectedNodes[i].id;
+                    updateDataNodes[i].color = {border: '#010101', background: '#010101'};
+                    updateDataNodes[i].x = selectedNodes[0].x + ( Math.cos(gatherAngle) * (400 + connectedNodeIds.length*30) ) /*+ ( Math.cos(gatherAngle) )*Math.pow(connectedNodeIds.length, 3)*0.05*/;
+                    updateDataNodes[i].y = selectedNodes[0].y + ( Math.sin(gatherAngle) * (400 + connectedNodeIds.length*30) ) /*+ ( Math.cos(gatherAngle) )*Math.pow(connectedNodeIds.length, 3)*0.05*/;
+                    previousConnectedNodes[i] = updateDataNodes[i]; // save the connected nodes in order to be able to deselct them
+                }
+                for(let i in connectedEdgeIds){
+                    updateDataEdges[i] = {};
+                    updateDataEdges[i].id = connectedEdges[i].id;
+                    updateDataEdges[i].color = {color: '#010101'};
+                    updateDataEdges[i].width = 8;
+                    previousConnectedEdges[i] = updateDataEdges[i];
+                }
+                nodesObj.update(updateDataNodes);
+                edgesObj.update(updateDataEdges);
+                /*console.log(nodesObj);
+                    for(let j = 0; j < updateData.length; j++){
+                        let tempid = updateData[j].id; 
+                        if( nodesObj._data[tempid] !== undefined ){
+                            console.log('splicing')
+                            
+                        }
+                    }*/
+                //console.log(nodesObj._data);
             }
 
-            console.log('x', clickLocation.clickX);
-            console.log('y', clickLocation.clickY);
-            addNode(clickLocation); 
-    });
-    
-    network.on('stabilized', function(){
-        let data = network.getPositions();
-        updateAll(['/positions'], data).then(function(response){
-            console.log(response);
+            function resetConnectedNodes(){
+                if(previousConnectedNodes.length > 0){
+                    for(let i in previousConnectedNodes){
+                        previousConnectedNodes[i].color = {border: '#EFEFEF', background: '#EFEFEF'};
+                        previousConnectedNodes[i].x = previousConnectedNodes[i].prevX;
+                        previousConnectedNodes[i].y = previousConnectedNodes[i].prevY;
+                    }
+                    for(let i in previousConnectedEdges){
+                        previousConnectedEdges[i].color = {color: '#DEDEDE'};
+                        previousConnectedEdges[i].width = 1;
+                    }
+                    nodesObj.update(previousConnectedNodes);
+                    edgesObj.update(previousConnectedEdges);
+                    previousConnectedNodes = [];
+                    previousConnectedEdges = [];
+                }
+            }
+
+            function showPatternContent(selectedNode){
+                patternEdit.style.display = 'none';
+                patternTitle.innerHTML = selectedNode.title;
+                patternObservation.innerHTML = selectedNode.problem;
+                patternInstruction.innerHTML = selectedNode.instruction;
+                patternContentDiagram.setAttribute('src', '../uploads/' + selectedNode.image);
+                patternRelation.style.display = 'none';
+                patternWindow.style.display = 'block';
+                patternContent.style.display = 'block';
+            }
+
+            function hidePatternContent(){
+                patternWindow.style.display = 'none';
+                patternContent.style.display = 'none';
+            }
+
+            function showPatternRelation(selectedNodes, selectedEdges){
+                if(selectedNodes.length === 0){
+                    console.log('No nodes passed - getting nodes from Edge');
+                    selectedNodes.push(nodesObj.get(selectedEdges[0].from));
+                    selectedNodes.push(nodesObj.get(selectedEdges[0].to));
+                    console.log(selectedNodes);
+                }
+                // if selectednode[0] is connected to [1]
+                    // set pattern relation contents
+                    // show pattern Relation
+                let relationEdge;
+                for(let i in selectedEdges){
+                    if(selectedNodes[0].id === selectedEdges[i].from || selectedNodes[0].id === selectedEdges[i].to){
+                        if(selectedNodes[1].id === selectedEdges[i].from || selectedNodes[1].id === selectedEdges[i].to){
+                            relationEdge = selectedEdges[i];
+                            patternContent.style.display = 'none';
+                            patternRelation.style.display = 'block';
+                            patternWindow.style.display = 'block';
+                            console.log(selectedEdges[i].text);
+                            relationText.innerHTML = relationEdge.text;
+                            patternRelationTitleA.innerHTML = 'FROM: ' + nodesObj.get([relationEdge.from])[0].title;
+                            patternRelationTitleB.innerHTML = 'TO: ' + nodesObj.get([relationEdge.to])[0].title;
+                            patternRelationDiagramA.setAttribute('src', '../uploads/' + nodesObj.get([relationEdge.from])[0].image );
+                            patternRelationDiagramB.setAttribute('src', '../uploads/' + nodesObj.get([relationEdge.to])[0].image );
+                        } // if
+                    } // if
+                } // for
+                // else: hide PatternWindow 
+            }
+
+            function moveToSelected(selectedNodes){
+                networkCircleShape();
+                if(selectedNodes[0].prevX){
+                    network.moveTo({
+                        position:{x: selectedNodes[0].prevX, y: selectedNodes[0].prevY},
+                        scale: 0.451,
+                        animation:{ duration: 500, },
+                    });
+                }
+                else{
+                    network.moveTo({
+                        position:{x: selectedNodes[0].x, y: selectedNodes[0].y},
+                        scale: 0.451,
+                        animation:{ duration: 500, },
+                        });
+                }
+            } // movetoSelected
+
+            function networkCircleShape(){ network.setOptions({nodes:{shape: 'circle', font:{vadjust: 130 }}}); }
+            function networkCircularImageShape(){ network.setOptions({nodes:{shape: 'circularImage', font:{vadjust: 5 }}}); }
+
+            network.on('select', function(selection){
+                // keep track of selected nodes
+                let selectedNodes = nodesObj.get(selection.nodes);
+                let selectedEdges = edgesObj.get(selection.edges);
+                // keep track of selected edges
+                if(selection.nodes.length === 1){ 
+                    moveToSelected(selectedNodes);
+                    resetConnectedNodes(); getConnectedNodes(selection); 
+                    console.log(selectedNodes);
+                    showPatternContent(selectedNodes[0]);
+                }
+                else if(selection.nodes.length === 2 || selection.edges.length === 1){
+                    showPatternRelation(selectedNodes, selectedEdges);
+                }
+                else{ resetConnectedNodes(); hidePatternContent(); }
+            });
+
+            network.on('dragEnd', function(selection){ 
+                console.log(selection);
+                updateNodePosition(selection); 
+                let selectedNodes = nodesObj.get(selection.nodes);
+                let data = network.getPositions();
+                if(selection.nodes.length > 0){
+                    moveToSelected(selectedNodes);
+                    resetConnectedNodes(); getConnectedNodes(selection);
+                    showPatternContent(selectedNodes[0]);
+                    updateAll(['/positions'], data).then(function(response){
+                        console.log(response);
+                    });
+                }
+            });
+
+            network.on('doubleClick', function(selection){
+                let clickLocation = {clickX: selection.pointer.canvas.x, clickY: selection.pointer.canvas.y,}
+                visjsInterface.addNode(clickLocation); 
+            });
+
+            network.on('zoom', function(zoom){
+                if(zoom.scale > 0.45){ networkCircularImageShape(); }
+                else{ networkCircleShape(); }
+            });
+
+            network.on('animationFinished', function(){ networkCircularImageShape(); });
+
+            var isSearch = false;
+            window.addEventListener('keydown', function(e){
+                let keyCode = e.keyCode;
+                if(keyCode === 70 && document.getElementById('patternWindow').style.display === 'none' && document.getElementById('searchInput') != document.activeElement ){ // f
+                    toggleSearch();
+                } 
+            });
+            function toggleSearch(){
+                    if(isSearch){
+                        searchWindow.style.display = 'none';
+                        isSearch = false;
+                        document.getElementById('searchInput').value = '';
+                    }
+                    else{
+                        searchWindow.style.display = 'block';
+                        window.setTimeout(function(){
+                            document.getElementById('searchInput').focus();
+                        }, 50);
+                        isSearch = true;
+                    }
+            }
+        // submission of the search form
+        document.getElementById('searchForm').addEventListener('submit', function(){
+            event.preventDefault();
+            let newSelection = [];
+            document.getElementById('searchWindow').style.display = 'none';
+            let allNodes = nodesObj.get();
+            let jumpToNode;
+            for(let i in allNodes){
+                let currentLabel = allNodes[i].label;
+                let searchInput = document.getElementById('searchInput').value;
+                if(currentLabel.includes(searchInput)  || currentLabel.toLowerCase().includes( searchInput ) ){
+                    console.log('Found node with id #' + allNodes[i].id + ': ' + allNodes[i].label);
+                    newSelection.push(allNodes[i].id);
+                    jumpToNode = allNodes[i];
+                }
+            }
+            network.setSelection({nodes: newSelection});
+            moveToSelected( nodesObj.get(network.getSelectedNodes()) );
+            document.getElementById('searchInput').value = '';
+            isSearch = false;
         });
+        document.getElementById('cancelSearch').addEventListener('click', function(){
+            toggleSearch();
+        });
+
+            resolve(network);
+            //visjsInterface.network = network; // export the network object on promise resolve
+        }); //getAll()
+        }); // return new Promise
+} // init Network
+
+
+// ==================================================
+// HANDLE PATTERN CLASSES
+// ==================================================
+
+var patternClassSelect = document.getElementById('patternClassSelect');
+patternClassSelect.addEventListener('change', function(){
+    //alert('the consequences will never be the same');
+    //console.log(patternClassSelect.options[patternClassSelect.selectedIndex].id);
+    if(patternClassSelect.options[patternClassSelect.selectedIndex].id === 'managePatternClasses'){
+        console.log('manage the damn classes');
+        patternEdit.style.display = 'none';
+        patternClassEdit.style.display = 'block';
+    }
+});
+
+
+visjsInterface.feedDebugger = function(){
+    let allVisIds = nodesObj.getIds()
+    document.getElementById('d_CurrentNodeIdsVis').innerHTML = '[' + allVisIds.length + ']: ' + allVisIds;
+    getAll(['/nodes']).then(function(response){
+            let allIds = [];
+            for(let i in response[0]){
+                allIds.push(response[0][i].vId);
+            }
+            allIds.sort(function(a,b){return a-b});
+            document.getElementById('d_CurrentNodeIdsOrient').innerHTML = '[' + allIds.length + ']: ' + allIds;
     });
-}); //getAll()
+}
 
-function checkHudDisable() { // check if HUD buttons need to be disabled, depending on what is selected
-    let selectedNodes = network.getSelectedNodes();
-    let selectedEdges = network.getSelectedEdges();
-
-    switch(selectedNodes.length){
-        /*case 0:
-            $('#deleteNodes').className += ' disabled'; // disable delete
-            break;*/
-        case 0:
-            document.getElementById("editNode").className = " disabled"; // disable edit
-            document.getElementById("deleteNodes").className = " disabled"; // disable delete
-            document.getElementById("connectNodes").className = " disabled"; // disable connect
-            if(selectedEdges.length > 0){ $('#deleteNodes').removeClass('disabled'); } // enable delete for edges             
-            break;
-        case 1:
-            $('#editNode').removeClass('disabled'); //enable Edit
-            $('#deleteNodes').removeClass('disabled'); // enable delete
-            break;
-        case 2: 
-            $("#connectNodes").removeClass('disabled'); // enable connect
-            document.getElementById("editNode").className = " disabled"; // disable edit
-            break;
-        case 3:
-            document.getElementById("connectNodes").className = " disabled"; // disable connect
-            break;
-        default:
-            document.getElementById("editNode").className = " disabled"; // disable edit
-            $('#deleteNodes').removeClass('disabled'); // enable delete
-            document.getElementById("connectNodes").className = " disabled"; // disable connect
-    } //switch
-} // checkHudDisable();     
-
-var exports = module.exports = {};
-exports.network = network;
-
-exports.addNode = function(){
-    addNode();
-};
-
-exports.deleteSelectedNode = function deleteSelectedNode(){
+visjsInterface.deleteSelectedNodes = function(){
                     let selectedNodes = network.getSelectedNodes(); // array containing ids
                     let selectedEdges = network.getSelectedEdges();
                     let selection = network.getSelection();
@@ -17639,8 +17859,6 @@ exports.deleteSelectedNode = function deleteSelectedNode(){
                             for (let i=0; i < selectedNodes.length; i++){
                                 nodesObj.remove({id: selectedNodes[i]}); // remove each selected node in frontend
                             }
-                            nodesObj.remove([-1,-2]);
-                            edgesObj.remove([-1,-2]);     
                         });                  
                     }
                     else if (selectedEdges){
@@ -17652,14 +17870,15 @@ exports.deleteSelectedNode = function deleteSelectedNode(){
                             }     
                         });
                     }
-                    checkHudDisable();
-}
+                    patternWindow.style.display = 'none';
+};
 
-exports.connectSelectedNodes = function connectSelectedNodes(){
+visjsInterface.connectSelectedNodes = function(){
                     getAll(['/edges']).then(function(response){
                         let selectedNodes = network.getSelectedNodes();
                         let allEdges = response[0];
                         //console.log(allEdges.length);
+                        console.log(selectedNodes);
                         let newEdgvId = getIds(allEdges);
                         console.log(newEdgvId);
                         let data = { 
@@ -17672,104 +17891,165 @@ exports.connectSelectedNodes = function connectSelectedNodes(){
                         })
                         // connect nodes in frontend
                         edgesObj.add({id: data.edgevId[0], from: data.from[0], to: data.to});
+                        network.setSelection({edges: [data.edgevId[0]] }, {unselectAll: false});
                     });
+};
+
+visjsInterface.swapEdgeDirection = function(){
+    let selectedEdges = network.getSelectedEdges();
+    let edgesArr = edgesObj.get(selectedEdges);
+    for(let i in edgesArr){
+        let temp = edgesArr[i].to;
+        edgesArr[i].to = edgesArr[i].from;
+        edgesArr[i].from = temp;
+    }
+    edgesObj.update(edgesArr);
+    updateAll(['/edges'], edgesArr);
+    patternRelationTitleA.innerHTML = 'FROM: ' + nodesObj.get([edgesArr[0].from])[0].title;
+    patternRelationTitleB.innerHTML = 'TO: ' + nodesObj.get([edgesArr[0].to])[0].title;
+    patternRelationDiagramA.setAttribute('src', '../uploads/' + nodesObj.get([edgesArr[0].from])[0].image );
+    patternRelationDiagramB.setAttribute('src', '../uploads/' + nodesObj.get([edgesArr[0].to])[0].image );
+    //showPatternRelation(null, edgesObj.get( network.getSelectedEdges() ) );
 }
 
-exports.editSelectedNode = function editSelectedNode(){
+visjsInterface.addNode = function(params){
+    getAll(['/nodes']).then( function(response){
+        let allNodes = response[0];
+        let newNodeId, newEdgeId;
+        let selectedNodes = network.getSelectedNodes(); // array
+        newNodeId = getIds(allNodes);
+        console.log('newNodeId', newNodeId);
+        // new node's data object
+        let data = { 
+            vId: newNodeId,
+            title: 'New Pattern #' + newNodeId,
+            problem: 'New Problem ' + newNodeId,
+            instruction: 'New Instruction ' + newNodeId,
+            label: '',
+            image: imgDir + '112_Entrance_transition.jpg',
+        };
+        data.label = data.title;
+        console.log('Params: ' + params);
+        if(params){ // if click location parameters are handed, use them for new node position
+            data.x = params.clickX;
+            data.y = params.clickY;
+            if ( selectedNodes.length > 0 ){ 
+                //nodesObj.remove([-1,-2]); 
+                data.y += 1000;
+            }
+        }
+        else if(selectedNodes.length > 0){ // if a node is selected, add new node near selected node
+            let selectedNode = nodesObj.get(selectedNodes[0]);
+            data.x = selectedNode.x;
+            data.y = selectedNode.y + 1000;
+            //nodesObj.remove([-1,-2]);
+        }
+        else{ // in the case of no nodes on canvas
+            data.x = 0;
+            data.y = 0;
+        }
+        // create the new node and the new edges in frontend
+        nodesObj.add({ 
+            id: data.vId, 
+            title: data.title, 
+            problem: data.problem, 
+            instruction: data.instruction, 
+            label: data.label,
+            image: data.image,
+            x: data.x,
+            y: data.y,
+        }); 
 
-editNode();
+        let newSelection = [data.vId]; // add new node to selection
+        // if a node is selected, automatically connect the new node
+        if( selectedNodes.length > 0 ){ 
+            getAll(['/edges']).then(function(response){
+                let allEdges = response[0];
+                newEdgeId = getIds(allEdges);
+                console.log('New Edge Id', newEdgeId);
+                //console.log('selected Nodes (from): ' + selectedNodes);
+                data.from = selectedNodes, // edges from (array)
+                data.to = newNodeId; // edges to
+                data.edgevId = [];
+                for (let i = 0; i < selectedNodes.length; i++){
+                    //newSelection.push(data.from[i]);
+                    data.edgevId.push(newEdgeId+i);
+                    edgesObj.add({id: data.edgevId[i], from: data.from[i], to: data.to});
+                }
+                console.log('Current dataset to push to db: ' + data);
+                postAll(['/nodes', '/edges'], data).then(function(response){ // save nodes and edges to backend
+                    console.log(response);
+                    network.unselectAll();
+                    network.setSelection({nodes: newSelection, edges: data.edgevId});
+                    visjsInterface.editSelectedNode();
+                }); //postAll(nodes,edges)
+            }); //getAll(edges)
+        } // if
+        else{ 
+            console.log('Current dataset to push to db: ' + data);
+            postAll(['/nodes'], data).then( function(response){
+                network.unselectAll();
+                network.setSelection({nodes: newSelection, edges: data.edgevId});
+                console.log( response );
+                visjsInterface.editSelectedNode();
+            }); 
+        } // or if nothing was selected, post only nodes
+    }); // getAll(nodes)
+};
 
+visjsInterface.editSelectedEdge = function(){
+    let selectedEdgeIds = network.getSelectedEdges();
+    let selectedEdges = edgesObj.get(selectedEdgeIds);
+    let selectedNodeIds = network.getSelectedNodes();
+    let selectedNodes = nodesObj.get(selectedNodeIds);
+    let relationEdges = [];
+
+    // get the edge connecting the two selected nodes
+    if(selectedNodes.length === 2){
+        for(let i = 0; i < selectedEdges.length; i++){
+            if(selectedNodes[0].id === selectedEdges[i].from || selectedNodes[0].id === selectedEdges[i].to){
+                if(selectedNodes[1].id === selectedEdges[i].from || selectedNodes[1].id === selectedEdges[i].to){
+                    relationEdges.push(selectedEdges[i]);
+                }
+            } // if
+        } // for
+    } // if
+
+    document.getElementById('patternRelationTxtArea').value = relationEdges[0].text;
+    relationText.innerHTML = relationEdges[0].text;
+
+    patternContent.style.display = 'none';
+    patternEdit.style.display = 'none';
+    patternRelation.style.display = 'block';
+    relationText.style.display = 'none';
+    patternRelationTxtArea.style.display = 'block';
+    relationForm.style.display = 'block';
+    patternWindow.style.display = 'block';
+
+    $('#relationForm').unbind('submit').bind('submit', function(event){
+        event.preventDefault();
+        relationEdges[0].text = document.getElementById('patternRelationTxtArea').value;
+       
+        edgesObj.update(relationEdges);
+        updateAll(['/edges'], relationEdges);
+        patternRelationTxtArea.style.display = 'none';
+        relationForm.style.display = 'none';
+        relationText.innerHTML = relationEdges[0].text;
+        relationText.style.display = 'block';
+        return false;
+    });
 }
 
-
-function addNode(params) {
-                getAll(['/nodes']).then( function(response) {
-                    let allNodes = response[0];
-                    let newNodeId, newEdgeId;
-                    let selectedNodes = network.getSelectedNodes(); // array
-                    newNodeId = getIds(allNodes);
-                    console.log('newNodeId', newNodeId);
-                    // new node's data object
-                    let data = { 
-                        vId: newNodeId,
-                        title: 'New Pattern #' + newNodeId,
-                        problem: 'New Problem ' + newNodeId,
-                        instruction: 'New Instruction ' + newNodeId,
-                        label: '',
-                        image: imgDir + '112_Entrance_transition.jpg',
-                    };
-                    data.label = data.title;
-                    if(params){ // if click location parameters are handed, use them for new node position
-                        data.x = params.clickX;
-                        data.y = params.clickY;
-                        if ( selectedNodes.length > 0 ){ 
-                            nodesObj.remove([-1,-2]); 
-                            data.y += 1000;
-                        }
-                    }
-                    else if(selectedNodes.length > 0){ // if a node is selected, add new node near selected node
-                        let selectedNode = nodesObj.get(selectedNodes[0]);
-                        data.x = selectedNode.x;
-                        data.y = selectedNode.y + 1000;
-                        nodesObj.remove([-1,-2]);
-                    }
-                    else{ // in the case of no nodes on canvas
-                        data.x = 0;
-                        data.y = 0;
-                    }
-                    // create the new node and the new edges in frontend
-                    nodesObj.add({ 
-                        id: data.vId, 
-                        title: data.title, 
-                        problem: data.problem, 
-                        instruction: data.instruction, 
-                        label: data.label,
-                        image: data.image,
-                        x: data.x,
-                        y: data.y,
-                    }); 
-
-                    let newSelection = [data.vId]; // add new node to selection
-                    // if a node is selected, automatically connect the new node
-                    if( selectedNodes.length > 0 ){ 
-                        getAll(['/edges']).then(function(response){
-                            let allEdges = response[0];
-                            newEdgeId = getIds(allEdges);
-                            console.log('New Edge Id', newEdgeId);
-                            //console.log('selected Nodes (from): ' + selectedNodes);
-                            data.from = selectedNodes, // edges from (array)
-                            data.to = newNodeId; // edges to
-                            data.edgevId = [];
-                            for (let i = 0; i < selectedNodes.length; i++){
-                                //newSelection.push(data.from[i]);
-                                data.edgevId.push(newEdgeId+i);
-                                edgesObj.add({id: data.edgevId[i], from: data.from[i], to: data.to});
-                            }
-                            postAll(['/nodes', '/edges'], data).then(function(response){ // save nodes and edges to backend
-                                console.log(response);
-                                network.unselectAll();
-                                network.setSelection({nodes: newSelection, edges: data.edgevId});
-                                checkHudDisable();
-                                editNode();
-                            }); //postAll(nodes,edges)
-                        }); //getAll(edges)
-                    } // if
-                    else{ 
-                        postAll(['/nodes'], data).then( function(response){
-                            network.unselectAll();
-                            network.setSelection({nodes: newSelection, edges: data.edgevId});
-                            checkHudDisable();
-                            console.log( response );
-                            editNode();
-                        }); 
-                    } // or if nothing was selected, post only nodes
-                }); // getAll(nodes)
-}
-
-
-function editNode(){
-    let editWindow = document.getElementById('editWindow');
-    editWindow.style.display = 'block';
+visjsInterface.editSelectedNode = function(){
+    let patternWindow = document.getElementById('patternWindow');
+    let patternEdit = document.getElementById('patternEdit');
+    let relationEdit = document.getElementById('relationEdit');
+    let patternContent = document.getElementById('patternContent');
+    let patternRelation = document.getElementById('patternRelation');
+    patternContent.style.display  = 'none';
+    patternRelation.style.display = 'none';
+    patternEdit.style.display = 'block';
+    patternWindow.style.display  = 'block';
 
     let selectedNodeId = network.getSelectedNodes(); // get array of selected nodes' ids
     let selectedNode = nodesObj.get(selectedNodeId); // array of nodes by id
@@ -17780,7 +18060,7 @@ function editNode(){
     document.getElementById('patternDiagram').src = selectedNode[0].image;
 
     //document.getElementById('saveEditButton').addEventListener('submit', function(e){
-      $('#uploadForm').unbind('submit').bind('submit', function(event){
+    $('#uploadForm').unbind('submit').bind('submit', function(event){
         event.preventDefault();
         let patternDiagram = document.getElementById('patternDiagram');
 
@@ -17809,18 +18089,29 @@ function editNode(){
             updateAll(['/nodes'], selectedNode[0]); // update node on DB     
         }
 
-        editWindow.style.display = 'none';
+        patternEdit.style.display = 'none';
+        patternTitle.innerHTML = selectedNode[0].title;
+        patternObservation.innerHTML = selectedNode[0].problem;
+        patternInstruction.innerHTML = selectedNode[0].instruction;
+        patternContent.style.display = 'block';
+        document.getElementById('uploadInput').value == "";
         return false;
     });
 
     document.getElementById('cancelEditButton').onclick = function(){
-        editWindow.style.display = 'none';
+        patternEdit.style.display = 'none';
+        patternTitle.innerHTML = selectedNode[0].title;
+        patternObservation.innerHTML = selectedNode[0].problem;
+        patternInstruction.innerHTML = selectedNode[0].instruction;
+        patternContentDiagram.setAttribute('src', '../uploads/' + selectedNode[0].image);
+        patternContent.style.display = 'block';
         document.getElementById('saveEditButton').removeAttribute("onclick");
         document.getElementById('cancelEditButton').removeAttribute("onclick");
     }
-
     //return data;
-}
+};
+
+var exports = module.exports = visjsInterface;
 
 /***/ }),
 /* 8 */
@@ -70556,12 +70847,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {__webpack_require__(2);
-var vis_ = __webpack_require__(7);
+var visjs = __webpack_require__(7);
 window.jQuery = window.$ = __webpack_require__(0);
 global.Tether = __webpack_require__(5);
 __webpack_require__(1);
 __webpack_require__(3);
 __webpack_require__(4);
+var isDebug = false;
 
 /*
 /* ================================
@@ -70569,20 +70861,81 @@ __webpack_require__(4);
 /* ================================
 */ 
 
+visjs.initCommonNetwork().then(function(network){
+	visjs.network = network;
+
+/*var projectReq = new XMLHttpRequest();
+projectReq.open('GET', '/nodes/someproject', true);
+    projectReq.onload = function() {
+   		if (projectReq.status === 200) { 
+   			console.log(projectReq.responseText); 
+   		}
+    	else { console.log('Error' + projectReq.statusText); } 
+	} // onload()
+	projectReq.send(null);*/
+
 var addNodeLink = document.getElementById("addNode");
 var deleteNodesLink = document.getElementById("deleteNodes");
 var connectNodesLink = document.getElementById("connectNodes");
 var editNodeLink = document.getElementById('editNode');
+var swapEdgeLink = document.getElementById('swapEdge');
 
-addNodeLink.addEventListener( "click", function() { vis_.addNode(); }); 
+visjs.network.on('selectNode', function(){ checkHudDisable(); }  );
+visjs.network.on('deselectNode', function(){ checkHudDisable(); }  );
+visjs.network.on('selectEdge', function(){ checkHudDisable(); }  );
+visjs.network.on('deselectEdge', function(){ checkHudDisable(); }  );
+visjs.network.on('dragEnd', function(){ checkHudDisable(); }  );
 
-deleteNodesLink.addEventListener("click", function(){ vis_.deleteSelectedNode(); });
+swapEdgeLink.addEventListener('click', function(){
+	visjs.swapEdgeDirection();
+});
 
-connectNodesLink.addEventListener("click",function(){ vis_.connectSelectedNodes(); });
+// debug window toggle
+window.addEventListener('keydown', function(e){
+	let keyCode = e.keyCode;
+	if(keyCode === 220){ // ^
+		toggleDebug();
+	}
+});
+
+//todo:
+//function toggleLogin(){};
+//function toggleEdit(){};
+//function toggleReg(){};
+//function toggleAddProject(){};
+
+function toggleDebug(){
+	let debugInterface = document.getElementById('debugInterface');
+	if(isDebug){
+		debugInterface.style.display = 'none';
+		isDebug = false;
+	}
+	else{
+		visjs.feedDebugger();
+		debugInterface.style.display = 'block';
+		isDebug = true;
+	}
+}
+
+addNodeLink.addEventListener( "click", function() { 
+	visjs.addNode(); checkHudDisable(); 
+}); 
+
+deleteNodesLink.addEventListener("click", function(){ 
+	visjs.deleteSelectedNodes(); checkHudDisable();
+});
+
+connectNodesLink.addEventListener("click",function(){ visjs.connectSelectedNodes(); });
 
 editNodeLink.addEventListener("click", function(){ 
 	if ( editNodeLink.classList.contains('disabled') === false ){
-		vis_.editSelectedNode();
+		if(visjs.network.getSelectedNodes().length === 0 && visjs.network.getSelectedEdges().length === 1){
+			visjs.editSelectedEdge();
+		}
+		else if(visjs.network.getSelectedNodes().length === 2){
+			visjs.editSelectedEdge();
+		}
+		else{visjs.editSelectedNode();}
 	}
 	else{
 		console.log('Either no nodes selected or more than one node selected.');
@@ -70624,6 +70977,9 @@ var loginNoticeDismiss = document.getElementById('loginDismiss');
 var loginForm = document.getElementById('loginForm');
 var registerForm = document.getElementById('registerForm');
 
+var searchWindow = document.getElementById('searchWindow');
+var searchForm = document.getElementById('searchForm');
+
 loginLink.addEventListener('click',function(){
 	logoutNotice.style.display = 'none';
 	loginWindow.style.display = 'block';
@@ -70636,7 +70992,7 @@ registerLink.addEventListener('click', function(){
 	loginWindow.style.display = 'block';
 	loginForm.style.display = 'none';
 	registerForm.style.display = 'block';
-})
+});
 
 loginWindow.addEventListener("mousedown", function(e){
 	if (loginWindow !== e.target && loginWindowParagraphs !== e.target ) return;
@@ -70685,7 +71041,6 @@ loginNoticeDismiss.addEventListener('click', function(e){
 	loginNotice.style.display = 'none';
 	loginWindow.style.display = 'none';
 });
-
 
 
 // Submission of the registration form
@@ -70789,7 +71144,6 @@ function getCurrentUser(){
 
 document.onload = getCurrentUser();
 
-
 // ==================================================
 // HANDLE USER PROJECTS
 // ==================================================
@@ -70817,7 +71171,7 @@ dismissProjectWindowButton.addEventListener('click', function(){
 });
 
 // save new project to db and add it to the project selection
-saveNewProjectButton.addEventListener('click', function(){
+/*saveNewProjectButton.addEventListener('click', function(){
    	projectWindow.style.display = 'none';
 
    	let data = {
@@ -70836,7 +71190,7 @@ saveNewProjectButton.addEventListener('click', function(){
 	refreshProjectList().then(function(){
 		selectProject(data.projectTitle);
 	});
-});
+});*/
 
 function selectProject(sel){
 	if(sel.options){ // if subitted parameter is a <select>
@@ -70854,8 +71208,9 @@ function selectProject(sel){
 		}
 	}
 	// destroy the current network
+	visjs.network.destroy();
 	// get all patterns and edges of the current project
-		// vis_.loadProject(selectedProject);
+		// visjs.loadProject(selectedProject);
 }
 
 function refreshProjectList(){
@@ -70864,10 +71219,12 @@ function refreshProjectList(){
 		getProjectsReq.open('GET', '/projects', true);
 	   	getProjectsReq.onload = function() {
 	   		if (getProjectsReq.status === 200) { 
-	   			projectOptions = JSON.parse(getProjectsReq.responseText); //responseText should be an array of projects
-				for(let i in projectOptions){
-					projectOptions[i] = '<option>' + projectOptions[i] + '</option>'
+	   			let projects = JSON.parse(getProjectsReq.responseText); //responseText should be an array of projects
+				let projectOptions = [];
+				for(let i in projects){
+					projectOptions[i] = '<option>' + projects[i].name + '</option>'
 				}
+				projectOptions.push('<option id="manageUserProjects">Manage projects...</option>');
 				document.getElementById('userprojects').innerHTML = projectOptions;
 				resolve('Projects refrehsed successfully');
 	   		}
@@ -70878,17 +71235,17 @@ function refreshProjectList(){
 }
 
 // ================================
-// EDIT WINDOW
+// PATTERN WINDOW
 // ================================
 
-var editWindow = document.getElementById('editWindow');
-var editWindowParagraphs = editWindow.getElementsByTagName('P')[0];
-editWindow.addEventListener("mousedown", function(e){
-	if (editWindow !== e.target && editWindowParagraphs !== e.target ) return;
+var patternWindow = document.getElementById('patternWindow');
+var patternWindowParagraphs = patternWindow.getElementsByTagName('P')[0];
+patternWindow.addEventListener("mousedown", function(e){
+	if (patternWindow !== e.target && patternWindowParagraphs !== e.target ) return;
 	dragWindow.startMoving(this, 'page', e);
 	e.preventDefault();
 });
-editWindow.addEventListener("mouseup", function(){
+patternWindow.addEventListener("mouseup", function(){
 	dragWindow.stopMoving('page');
 });
 
@@ -70896,6 +71253,43 @@ editWindow.addEventListener("mouseup", function(){
 // ================================
 // UI FUNCTIONALITY
 // ================================
+
+function checkHudDisable() { // check if HUD buttons need to be disabled, depending on what is selected
+    let selectedNodes = visjs.network.getSelectedNodes();
+    let selectedEdges = visjs.network.getSelectedEdges();
+
+    switch(selectedNodes.length){
+        /*case 0:
+            $('#deleteNodes').className += ' disabled'; // disable delete
+            break;*/
+        case 0:
+            document.getElementById("editNode").className = " disabled"; // disable edit
+            document.getElementById("deleteNodes").className = " disabled"; // disable delete
+            document.getElementById("connectNodes").className = " disabled"; // disable connect
+            if(selectedEdges.length > 0){ 
+            	$('#deleteNodes').removeClass('disabled'); 
+            	$('#editNode').removeClass('disabled'); //enable Edit of edges
+            } // enable delete for edges             
+            break;
+        case 1:
+            $('#editNode').removeClass('disabled'); //enable Edit
+            $('#deleteNodes').removeClass('disabled'); // enable delete
+            break;
+        case 2: 
+            $("#connectNodes").removeClass('disabled'); // enable connect
+            //document.getElementById("editNode").className = " disabled"; // disable edit
+            $('#editNode').removeClass('disabled'); //enable Edit of relations
+            break;
+        case 3:
+            document.getElementById("connectNodes").className = " disabled"; // disable connect
+            break;
+        default:
+            document.getElementById("editNode").className = " disabled"; // disable edit
+            $('#deleteNodes').removeClass('disabled'); // enable delete
+            document.getElementById("connectNodes").className = " disabled"; // disable connect
+    } //switch
+} // checkHudDisable();     
+
 
 var dragWindow = function(){
     return {
@@ -70942,6 +71336,8 @@ var dragWindow = function(){
         },
     }
 }();
+
+});//initNetwork.then
 
 /*$(document).click(function(e) {
     if (e.shiftKey) {

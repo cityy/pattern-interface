@@ -25,7 +25,7 @@ var storage = multer.diskStorage({
 });
 var upload = multer({storage: storage});
 
-var oDB = require('./sv_orientdb.js');
+var db = require('./sv_orientdb.js');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -108,7 +108,7 @@ passport.use('local-signin', new LocalStrategy(
 
 function localAuth(username, password){
 	return new Promise ( function(resolve, reject){
-		oDB.db.query(
+		db.query(
 			'select from users' + ' where username=:username',
 			{params:{
 				username: username
@@ -156,7 +156,7 @@ passport.use('local-signup', new LocalStrategy(
 function localReg (username, password){
 	return new Promise ( function(resolve, reject){
 	// 01 get all users from the db
-		oDB.db.class.get('users').then( function ( users ){
+		db.class.get('users').then( function ( users ){
 			users.list().then(function(records){ // records[]
 				// 02 check if the new username is taken
 				let usernameTaken = false;
@@ -182,8 +182,25 @@ function localReg (username, password){
 						username: username,
 						password: hash,
 						uId: newId,
-						projects: ['My Language'] //default project
+						//projects: ['MyLanguage'] //default project
 					}).then(function(newUser){
+						let query = 'alter class projects addcluster ' + newUser.username + '_Projects'
+						db.query(query).then(function(){
+							query = 'insert into projects cluster ' + newUser.username + '_Projects set owner = "' + newUser.username + '", name = "MyProjectLanguage", shared = false';
+							db.query(query).then(function(){
+								query = 'alter class patterns addcluster ' + newUser.username + '_Patterns_MyProjectLanguage';
+								db.query(query).then(function(){
+									query = 'alter class patternconnections addcluster ' + newUser.username + '_PatternConnections_MyProjectLanguage';;
+									db.query(query).then(function(){
+										query = 'alter class patternClasses addcluster ' + newUser.username + '_PatternClasses_MyProjectLanguage';
+										db.query(query).then(function(){
+											console.log('Set up default project for user ' + newUser.username);
+										});
+									});
+								});
+							});
+						});
+						// create classes for the user's  default project's nodes and edges
 						resolve( newUser );
 					});
 				}
@@ -197,19 +214,41 @@ function localReg (username, password){
 // VisJs Data Routes
 // ====================================================================================================
 
+// NODES GET FOR SPECIFIC PROJECT 
+app.get('/nodes/:project', function(req, res){
+	let projectName = req.body.project;
+	console.log(req.body.projectName);
+	db.query('select from projects where name = ' + projectName).then(function(project){
+		if(project.owner = req.user.username){
+			db.query('select from cluster:' + req.user.username + '_patterns_' + projectName).then(function(projectNodes){
+				res.send(projectNodes);
+			});
+		}
+		else{ // if the project owner is not the current user, it is a common project
+			db.query('select from cluster:common_patterns_' + projectName).then(function(projectNodes){
+				res.send(projectNodes);
+			});
+		}
+	});
+});
+
 // NODES GET
 app.get('/nodes', function(req, res){ // request for all the nodes
-	oDB.db.class.get('pattern').then( function(pattern){
-		pattern.list().then( function(records){ // promises records of class pattern, records is an associative array
-			res.send( records );
+	db.query(
+		'SELECT FROM patterns',
+		{
+			limit: -1,
+		}
+		).then(function(records){
+			res.send(records);
 		});
-	}); // db.class.get('pattern')
 });
 
 // NODES POST
 app.post('/nodes', function(req, res){
-	console.log(req.body);
-	oDB.db.class.get('pattern').then(function(pattern){
+	//req.body.nodes
+	//console.log('Incoming Data (post: /nodes):' + req.body);
+	db.class.get('patterns').then(function(pattern){
 		pattern.create({
 			vId: req.body.vId,
 			title: req.body.title,
@@ -231,9 +270,9 @@ app.put('/nodes', function(req, res){
 	let data = req.body;
 	let vId = data.id;
 	delete data.id;
-	oDB.db.select().from('pattern').where({vId: vId}).all().then(function(selectedNode){
+	db.select().from('patterns').where({vId: vId}).all().then(function(selectedNode){
 		let rid = '#' + selectedNode[0]['@rid'].cluster + ':' + selectedNode[0]['@rid'].position;
-		oDB.db.update(rid).set(req.body).scalar();
+		db.update(rid).set(req.body).scalar();
 		res.send('Updated Pattern: ' + vId);
 	});
 });
@@ -244,7 +283,7 @@ app.delete('/nodes', function(req, res){
 	var promises = []; // for collection of all promises
 	function deleteNode(vId){ 
 		return new Promise(function(resolve, reject){ // promise that deletes a vertex from orientDB
-			oDB.db.delete('VERTEX', 'pattern').where('vId=' + vId).one();
+			db.delete('VERTEX', 'patterns').where('vId=' + vId).one();
 			resolve(vId); // promise return value
 		}); 
 	}
@@ -259,11 +298,14 @@ app.delete('/nodes', function(req, res){
 
 // EDGES GET
 app.get('/edges', function(req, res){
-	oDB.db.class.get('patternconnections').then(function(patternconnections){
-		patternconnections.list().then(function(records){
-			res.send( records );
+	db.query(
+		'SELECT FROM patternconnections',
+		{
+			limit: -1,
+		}
+		).then(function(records){
+			res.send(records);
 		});
-	});
 });
 
 // EDGES POST
@@ -276,13 +318,13 @@ app.post('/edges', function(req, res){
 	var f = {
 		create: function(i){
 			var promise = new Promise(function(resolve, reject){
-				oDB.db.select().from('pattern').where({vId: fromId[i]}).all().then(function(selectFrom){
-					oDB.db.select().from('pattern').where({vId: toId}).all().then(function(selectTo){
+				db.select().from('patterns').where({vId: fromId[i]}).all().then(function(selectFrom){
+					db.select().from('patterns').where({vId: toId}).all().then(function(selectTo){
 						let fromRid = '#' + selectFrom[0]['@rid'].cluster + ':' + selectFrom[0]['@rid'].position;
 						let toRid = '#' + selectTo[0]['@rid'].cluster + ':' + selectTo[0]['@rid'].position;
 						console.log(vId[i]);
 
-						oDB.db.create('EDGE', 'patternconnections').from(fromRid).to(toRid).set({ 
+						db.create('EDGE', 'patternconnections').from(fromRid).to(toRid).set({ 
 							fromId: fromId[i], // save nodvIds (not the rids)
 							toId: toId,
 							vId: vId[i]
@@ -309,7 +351,7 @@ app.delete('/edges', function(req, res){
 	var promises = []; // for collection of all promises
 	function deleteNode(vId){ 
 		return new Promise(function(resolve, reject){ // promise that deletes a vertex from orientDB
-			oDB.db.delete('EDGE', 'patternconnections').where('vId=' + vId).one();
+			db.delete('EDGE', 'patternconnections').where('vId=' + vId).one();
 			resolve(vId); // promise return value
 		}); 
 	}
@@ -322,14 +364,37 @@ app.delete('/edges', function(req, res){
 	}).catch(function(err){ console.log(err) });
 }); // app.delete(/edges)
 
+app.put('/edges', function(req, res){
+	console.log(req.body);
+	let data = req.body[0];
+	let vId = data.id;
+	delete data.id;
+	db.query(
+			'UPDATE EDGE patternconnections ' +
+			'SET fromId=:dataFrom, toId=:dataTo ' +
+			'SET text=:dataText ' +
+			'WHERE vId=:vId ',
+			{
+				params:{
+					vId: vId,
+					dataFrom: data.from,
+					dataTo: data.to,
+					dataText: data.text,
+				}
+			}
+		).then(function(){
+			res.send('Swapped direction of Edge #' + vId);
+		});
+});
+
 // NETWORK POSITIONS PUT
 app.put('/positions', function(req,res){
 	for ( let i in req.body ){
 		if (i > 0 ){
 			let vId = i;
-			oDB.db.select().from('pattern').where({vId: vId}).all().then(function(selectedNode){
+			db.select().from('patterns').where({vId: vId}).all().then(function(selectedNode){
 				let rid = '#' + selectedNode[0]['@rid'].cluster + ':' + selectedNode[0]['@rid'].position;
-				oDB.db.update(rid).set(req.body[i]).scalar();
+				db.update(rid).set(req.body[i]).scalar();
 			});
 		}
 		//else{console.log('Skipping UI Node');}
@@ -396,7 +461,7 @@ app.get('/user', function(req, res){
 app.post('/projects', function(req, res){
 	let newProject = req.body.projectTitle;
 
-	oDB.db.query(
+	db.query(
 		'update users' + ' add projects=:newProject ' + 'where username=:username',
 		{params:{
 			username: req.user.username,
@@ -407,12 +472,16 @@ app.post('/projects', function(req, res){
 }); // post('/project')
 
 app.get('/projects', function(req, res){
-	oDB.db.query(
-		'select from users' + ' where username=:username',
+	db.query(
+		'select from projects' + ' where owner = :username',
 		{ params: {username: req.user.username, } } )
-		.then(function(user){
-			console.log( user[0] ) ;
-			res.send(user[0].projects );
+		.then(function(projects){
+			db.query('select from cluster:common_Projects').then(function(commonProjects){
+				for(let i in commonProjects){
+					projects.push(commonProjects[i]);
+				}
+				res.send(projects);
+			})
 		})
 });
 
