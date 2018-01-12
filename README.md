@@ -9,8 +9,8 @@ Ferdinand List - ferdinand.list at gmail dot com
 - [ ] do an all around check for sql injection exploits
 
 #### Projects
-- [ x ] create new database clusters on svPrj.post()
-- [ x ] copy data from inherited Project when creating a new project*
+- [x] create new database clusters on svPrj.post()
+- [x] copy data from inherited Project when creating a new project*
 
 ### Client
 
