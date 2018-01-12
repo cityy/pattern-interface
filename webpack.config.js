@@ -1,4 +1,6 @@
 var path = require('path');
+var FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const extractSass = new ExtractTextPlugin({
@@ -45,6 +47,7 @@ module.exports = {
     }]
   },
   plugins: [
-	extractSass
+	extractSass,
+	new FriendlyErrorsWebpackPlugin(),
   ]
 };

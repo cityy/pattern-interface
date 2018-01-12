@@ -32,7 +32,7 @@ block content
   //- HUD 
   //- ==================================================
 
-  nav(class="navbar fixed-top navbar-toggleable-md")
+  nav(class="navbar navbar-inverse bg-inverse fixed-top navbar-expand-md")
    button(class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation")
     span(class="navbar-toggler-icon")
    a(class="navbar-brand " href="#")
@@ -52,12 +52,13 @@ block content
        | Login
       a(class="nav-link" href='#' id='registerLink')
        | Register
+     li(class="nav-item" id="searchLi")
+      a(class='nav-link' href='#')
+       i(class='fa fa-search' id='searchPatternIcon')
      li(class="nav-item" id="projectSelection")
       form(class="form-inline")
        select(class="form-control form-control-sm" id="userprojects")
         option Select Project..
-      a(class='nav-link' href='#')
-       i(class='fa fa-plus' id='addProject')
 
   div#hud
    div.container-fluid
@@ -223,13 +224,13 @@ block content
    form(id='registerForm' name='register' action='/local-reg' method='post') 
     h3 Register
     p Username:
-    input(type='text' id='username' name='username' placeholder='Enter username...')
+    input(type='text' id='regUsername' name='regUsername' placeholder='Enter username...')
     | <br /> <br />
     p E-Mail:
     input(type='text' id='email'  name='email' placeholder='Enter E-mail address...')
     | <br /> <br />
     p Password:
-    input(type='password' id='password' name='password' placeholder='Enter password...')
+    input(type='password' id='regPassword' name='regPassword' placeholder='Enter password...')
     | <br /> <br />
     p Comfirm Password:
     input(type='text' id='confirmpassword' name='confirmpassword' placeholder='Confirm password...')
@@ -240,6 +241,18 @@ block content
      | Cancel
     a(href='#' id='goToLogin')
      | <br /> <br />  Already have an account? <br />Go to login.
+
+   //- Register Notice
+   div(id='regNotice')
+    h3 Registration successful!
+    span 
+     | Thank you for registering
+    span(id='welcomeNameReg')
+     | user
+    span
+     | ! <br /> <br />
+    button(type='button' id='regDismiss')
+     | Get started!
 
    //- Logout Notice
    div(id='logoutNotice')
@@ -253,14 +266,31 @@ block content
   div(id='projectWindow')
    div.container-fluid
     div(class='row justify-content-center')
-     h3 Add new Project
-     form
-      p Project Title:
-      input(name='Project Title' type='text' id='newProjectTitleInput' placeholder='Project title')
-      button(type='button' id='saveNewProjectButton')
-       | Save Project
-      button(type='button' id='cancelProjectButton')
-       | Cancel
+     h3 Manage Projects: 
+      span(id='manageProjectsUser') Username
+
+     ul.list-group#projectsTable
+      li.list-group-item#projectshead
+       div.row
+        div(class="col-8" style="text-align:left;") Project
+        div.col Nodes
+        div.col Edges
+        div.col Options
+      div#projectlist
+      li(class='list-group-item' id='projectsTableFooter' style="padding:0;")
+       div.row(style='margin-top: 1em;')
+        div.col#filtercol
+         form.inline-form
+          input(type="text" class="form-control" id="projectFilter" placeholder="Type to filter or add projects" autocomplete="off")
+        div(class='col' style="text-align: left; display: none;")
+         button(id="addProjectButton" type="button" class="btn btn-primary btn-lg btn-block" style='background-color:#107896;')
+          i(class="fa fa-plus")
+          | Add New
+     div.container-fluid
+      div.row.d-flex.justify-content-center(style="margin-top: 1em;")
+       form
+        button(type='button' id='doneProjectButton')
+         | Done
 
 
   div(id='searchWindow')

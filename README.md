@@ -1,44 +1,40 @@
 # pattern-interface
-
-Pattern Interface is translating parts of Christopher Alexander's Timeless Way of Building (1977) to a Web Interface.
+Pattern Interface is a graph based representation of a variety of attempts to an objectification of architectural design. Based on Christopher Alexander's theory of a pattern language, it aims to show relational comprehensions of architecture and to reveal meta data statistics based on their inner structure and usage. 
 
 Ferdinand List - ferdinand.list at gmail dot com
 
 ## Roadmap
 
-### HUD
-- [X] add nodes
-  - [X] if nodes are selected, add edges to selected nodes
-- [X] remove selected nodes and corresponding edges
-- [X] edit nodes
-	- [X] disable edit if more/less than 1 node is selected
-- [X] connect nodes
-	- [X] disable connect id more/less than 2 nodes are selected
-- [ ] zoom, zoomlevel
+### Server
+- [ ] do an all around check for sql injection exploits
 
-### Frontend 
-- [X] add a way to display pattern contents
-- [X] make edit node window dragable and improve UI
-- [X] use pattern diagrams as node icons
-- [ ] introduce project based pattern sequences
-	- [ ] highlight sequence nodes and edges
-	- [ ] create entry point functionality
+#### Projects
+- [ ] create new database clusters on svPrj.post()
+- [ ] copy data from inherited Project when creating a new project*
 
-### Backend 
-- [X] use a database to generate and handle nodes / edges (OrientDB)
-	- [X] initialize nodes and edges from the database
-	- [X] operate all edge/node updates on the database
-- [X] add users
-- [ ] add user projects / user languages
-	- [X] add functionality to create and select projects
-	- [ ] add functionality to edit and delete projects
-	- [ ] link projects to visJS and the database
+### Client
 
-### Content
-- [ ] add global language patterns
-- [ ] add global language patterns' diagrams
-- [ ] set global language clusters
+#### Patterns
+- [ ] fix pattern editing
+- [ ] fix pattern relation display*
+- [ ] add pattern tagging**
 
-### AI
-- [ ] compare user languages to global language
-  - [ ] evaluate quantity of user defined connections in comparison to the global language
+#### Projects
+- [ ] redraw Graph when a new project is selected*
+- [ ] Enable project selection from the 'manage' window
+- [ ] confirmation for deleting projects
+- [ ] add the ability to link patterns cross projects, maybe automated
+
+#### Graph
+- [ ] add node positioning and grouping based on tags
+- [ ] add node coloring based on tags and content
+
+#### Search
+- [ ] change behaviour when multiple nodes are found for the given search term
+- [ ] add advanced search by content
+
+#### Stats
+- [ ] add a statistics display (user data and projects data)*
+
+
+* Priority, the more the merrier
